@@ -26,6 +26,8 @@
     margin-top: unset;
     margin-bottom: unset;
     max-width: 75% !important;
+    /* margin-left: 10%;
+    margin-right: 10%; */
 }
 
 .btn-green {
@@ -46,4 +48,9 @@
 
 .survey {
     text-align: left;
+}
+
+.free-drawing {
+    text-align: left;
+    display: flex;
 }

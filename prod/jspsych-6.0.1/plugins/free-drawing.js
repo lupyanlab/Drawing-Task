@@ -22,11 +22,13 @@ jsPsych.plugins["free-drawing"] = (function () {
 		var trial_data = {
 			parameter_name: 'parameter value'
 		};
+		let percentage = 0.4;
 
 		display_element.innerHTML = `
-<canvas id="c" width="1000" height="1000" style="border: 1px solid rgb(170, 170, 170); position: absolute; width: 500px; height: 500px; left: 0px; top: 0px; touch-action: none; user-select: none;" class="lower-canvas"></canvas>
+		<div class="free-drawing">
+		<canvas id="c" class="" width="${window.innerWidth * percentage}" height="${window.innerWidth * percentage}" style="border: 1px solid rgb(170, 170, 170); position: absolute; touch-action: none; user-select: none;" class="lower-canvas"></canvas>
 
-			<div style="display: inline-block; margin-left: 10px">
+			<div class="" style="display: inline-block; margin-left: 10px">
 				<button id="drawing-mode" class="btn btn-info">Cancel drawing mode</button><br>
 				<button id="clear-canvas" class="btn btn-info">Clear</button><br>
 
@@ -60,7 +62,10 @@ jsPsych.plugins["free-drawing"] = (function () {
 					<label for="drawing-shadow-offset">Shadow offset:</label>
 					<span class="info">0</span><input type="range" value="0" min="0" max="50" id="drawing-shadow-offset"><br>
 				</div>
+			</div>
 			</div>`;
+
+			
 
 		(function () {
 			var $ = function (id) { return document.getElementById(id) };
