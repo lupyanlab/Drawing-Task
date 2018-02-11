@@ -27,7 +27,14 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
             return false;
         }
         return false;
-    };
+    };;
+
+    let freeDrawing = {
+        type: "free-drawing",
+        word: "hello",
+    }
+
+    timeline.push(freeDrawing);
 
 
     // declare the block.
@@ -61,7 +68,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
         ]
     };
 
-    timeline.push(instructions);
+    timeline.push(instructions)
 
     let trial_number = 1;
     let num_trials = trials.length;
