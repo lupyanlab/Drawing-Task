@@ -31,7 +31,25 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
 
     let freeDrawing = {
         type: "free-drawing",
-        word: "hello",
+        prompt: "hello",
+        on_finish: function (data) {
+            let response = {
+                image: data.drawing,
+                workerId: subjCode,
+                trial_number: 10,
+                prompt: 'hello'
+            }
+            // POST response data to server
+            $.ajax({
+                url: 'http://' + document.domain + ':' + PORT + '/image',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(response),
+                success: function () {
+                    console.log(response);
+                }
+            })
+        }
     }
 
     timeline.push(freeDrawing);

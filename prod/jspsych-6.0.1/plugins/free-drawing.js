@@ -9,7 +9,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 	plugin.info = {
 		name: "free-drawing",
 		parameters: {
-			word: {
+			prompt: {
 				type: jsPsych.plugins.parameterType.STRING, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
 				default_value: undefined
 			}
@@ -25,10 +25,12 @@ jsPsych.plugins["free-drawing"] = (function () {
 		let percentage = 0.4;
 
 		display_element.innerHTML = `
+		<h1>${trial.prompt}</h1>
 		<div class="free-drawing">
 		<canvas id="c" class="" width="${window.innerWidth * percentage}" height="${window.innerWidth * percentage}" style="border: 1px solid rgb(170, 170, 170); position: absolute; touch-action: none; user-select: none;" class="lower-canvas"></canvas>
 
 			<div class="" style="display: inline-block; margin-left: 10px">
+				<button id="submit-drawing" class="btn btn-info">Submit Drawing</button><br>
 				<button id="drawing-mode" class="btn btn-info">Cancel drawing mode</button><br>
 				<button id="clear-canvas" class="btn btn-info">Clear</button><br>
 
@@ -65,15 +67,15 @@ jsPsych.plugins["free-drawing"] = (function () {
 			</div>
 			</div>`;
 
-			
+
 
 		(function () {
 			var $ = function (id) { return document.getElementById(id) };
 
 			var canvas = this.__canvas = new fabric.Canvas('c', {
-				isDrawingMode: true
+				isDrawingMode: true,
+				backgroundColor : "#ffffff"
 			});
-
 			fabric.Object.prototype.transparentCorners = false;
 
 			var drawingModeEl = $('drawing-mode'),
@@ -83,9 +85,17 @@ jsPsych.plugins["free-drawing"] = (function () {
 				drawingLineWidthEl = $('drawing-line-width'),
 				drawingShadowWidth = $('drawing-shadow-width'),
 				drawingShadowOffset = $('drawing-shadow-offset'),
-				clearEl = $('clear-canvas');
+				clearEl = $('clear-canvas'),
+				submitDrawing = $('submit-drawing');
 
 			clearEl.onclick = function () { canvas.clear() };
+			submitDrawing.onclick = function () {
+				console.log('cick')
+				jsPsych.finishTrial({
+					drawing: document.getElementById('c').toDataURL(),
+					prompt: trial.prompt
+				});
+			}
 
 			drawingModeEl.onclick = function () {
 				canvas.isDrawingMode = !canvas.isDrawingMode;
@@ -240,7 +250,6 @@ jsPsych.plugins["free-drawing"] = (function () {
 		})();
 
 		// end trial
-		// jsPsych.finishTrial(trial_data);
 	};
 
 	return plugin;

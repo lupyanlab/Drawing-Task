@@ -67,7 +67,7 @@ app.post('/trials', function (req, res, next) {
 app.post('/data', function (req, res, next) {
   console.log('data post request received');
 
-  // Create new data file if does not exist
+  // Create new data folder if does not exist
   let response = req.body;
   fs.access('./data', (err) => {
     if (err && err.code === 'ENOENT') {
@@ -163,3 +163,48 @@ app.post('/demographics', function (req, res, next) {
 
     res.send({ success: true });
   });
+
+
+// POST endpoint for receiving image responses
+app.post('/image', function (req, res, next) {
+  console.log('image post request received');
+
+  // Create new data folder if does not exist
+  let response = req.body;
+  console.log(response);
+  fs.access('./data', (err) => {
+    if (err && err.code === 'ENOENT') {
+      fs.mkdir('./data', () => {
+        next();
+      });
+    }
+    else next();
+  });
+
+},
+  (req, res, next) => {
+    // Create new user folder if does not exist
+    let response = req.body;
+    fs.access('./data/' + response.workerId, (err) => {
+      if (err && err.code === 'ENOENT') {
+        fs.mkdir('./data/' + response.workerId, () => {
+          next();
+        });
+      }
+      else next();
+    });
+  },
+  (req, res, next) => {
+    // save as png
+    let response = req.body;
+    var base64Data = response.image.replace(/^data:image\/png;base64,/, "");
+
+    fs.writeFile('./data/' + response.workerId+'/'+response.workerId+'_'+response.prompt+'_'+response.trial_number+'.png', base64Data, 'base64', function (err) {
+      if (err) {
+        res.send({ success: false });
+        return next(err);
+      }
+      res.send({ success: true });
+    });
+  });
+
