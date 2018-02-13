@@ -12,6 +12,10 @@ jsPsych.plugins["free-drawing"] = (function () {
 			prompt: {
 				type: jsPsych.plugins.parameterType.STRING, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
 				default_value: undefined
+			},
+			timer: {
+				type: jsPsych.plugins.parameterType.INT, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
+				default_value: 60
 			}
 		}
 	}
@@ -25,6 +29,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 		let percentage = 0.4;
 
 		display_element.innerHTML = `
+		<h1 id="timer">${trial.timer}</h1>
 		<h1>${trial.prompt}</h1>
 		<div class="free-drawing">
 		<canvas id="c" class="" width="${window.innerWidth * percentage}" height="${window.innerWidth * percentage}" style="border: 1px solid rgb(170, 170, 170); position: absolute; touch-action: none; user-select: none;" class="lower-canvas"></canvas>
@@ -69,8 +74,11 @@ jsPsych.plugins["free-drawing"] = (function () {
 
 
 
+
 		(function () {
 			var $ = function (id) { return document.getElementById(id) };
+			let countdownStarted = false;
+			let timer = trial.timer;
 
 			var canvas = this.__canvas = new fabric.Canvas('c', {
 				isDrawingMode: true,
@@ -85,17 +93,31 @@ jsPsych.plugins["free-drawing"] = (function () {
 				drawingLineWidthEl = $('drawing-line-width'),
 				drawingShadowWidth = $('drawing-shadow-width'),
 				drawingShadowOffset = $('drawing-shadow-offset'),
-				clearEl = $('clear-canvas'),
-				submitDrawing = $('submit-drawing');
+				clearEl = $('clear-canvas');
 
 			clearEl.onclick = function () { canvas.clear() };
-			submitDrawing.onclick = function () {
-				console.log('cick')
+
+			
+			$('submit-drawing').onclick = ()=>{
 				jsPsych.finishTrial({
 					drawing: document.getElementById('c').toDataURL(),
 					prompt: trial.prompt
 				});
-			}
+			};
+
+			canvas.on({
+				'mouse:down': () => {
+					if (!countdownStarted) {
+						timer--;
+						$('timer').innerHTML = timer;
+						setInterval(() => {
+							timer--;
+							$('timer').innerHTML = timer;
+						}, 1000)
+						countdownStarted = true;
+					}
+				}
+			})
 
 			drawingModeEl.onclick = function () {
 				canvas.isDrawingMode = !canvas.isDrawingMode;
