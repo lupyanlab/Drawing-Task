@@ -32,7 +32,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     let freeDrawing = {
         type: "free-drawing",
         prompt: "hello",
-        timer: 60,
+        timer: 100000,
         on_finish: function (data) {
             let response = {
                 image: data.drawing,

@@ -29,7 +29,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 		let percentage = 0.4;
 
 		display_element.innerHTML = `
-		<h1 id="timer">${trial.timer}</h1>
+		<h1 id="timer">${Math.floor(trial.timer)}</h1>
 		<h1>${trial.prompt}</h1>
 		<div class="free-drawing">
 		<canvas id="c" class="" width="${window.innerWidth * percentage}" height="${window.innerWidth * percentage}" style="border: 1px solid rgb(170, 170, 170); position: absolute; touch-action: none; user-select: none;" class="lower-canvas"></canvas>
@@ -82,7 +82,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 
 			var canvas = this.__canvas = new fabric.Canvas('c', {
 				isDrawingMode: true,
-				backgroundColor : "#ffffff"
+				backgroundColor: "#ffffff"
 			});
 			fabric.Object.prototype.transparentCorners = false;
 
@@ -97,8 +97,8 @@ jsPsych.plugins["free-drawing"] = (function () {
 
 			clearEl.onclick = function () { canvas.clear() };
 
-			
-			$('submit-drawing').onclick = ()=>{
+
+			$('submit-drawing').onclick = () => {
 				jsPsych.finishTrial({
 					drawing: document.getElementById('c').toDataURL(),
 					prompt: trial.prompt
@@ -108,12 +108,21 @@ jsPsych.plugins["free-drawing"] = (function () {
 			canvas.on({
 				'mouse:down': () => {
 					if (!countdownStarted) {
-						timer--;
-						$('timer').innerHTML = timer;
-						setInterval(() => {
-							timer--;
-							$('timer').innerHTML = timer;
-						}, 1000)
+						timer-=0.01;
+						$('timer').innerHTML = Math.floor(timer);
+						let countdown = setInterval(() => {
+							timer-=0.01;
+							if (timer < 0) {
+								clearInterval(countdown);
+								jsPsych.finishTrial({
+									drawing: document.getElementById('c').toDataURL(),
+									prompt: trial.prompt
+								});
+							}
+							else {
+								$('timer').innerHTML = Math.floor(timer);
+							}
+						}, 10)
 						countdownStarted = true;
 					}
 				}
