@@ -31,32 +31,6 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     return false;
   };
 
-  let freeDrawing = {
-    type: "free-drawing",
-    prompt: "hello",
-    timer: 60,
-    on_finish: function(data) {
-      let response = {
-        image: data.drawing,
-        workerId: subjCode,
-        trial_number: 10,
-        prompt: "hello"
-      };
-      // POST response data to server
-      $.ajax({
-        url: "http://" + document.domain + ":" + PORT + "/image",
-        type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(response),
-        success: function() {
-          console.log(response);
-        }
-      });
-    }
-  };
-
-  timeline.push(freeDrawing);
-
   // declare the block.
   var consent = {
     type: "html",
@@ -97,26 +71,28 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
 
   // Pushes each audio trial to timeline
   for (let trial of trials) {
-    let choices = trial.randomize_choices
-      ? _.shuffle(trial.choices)
-      : trial.choices;
     // Empty Response Data to be sent to be collected
     let response = {
       workerId: subjCode,
       trialNum: trial_number,
-      prompt: trial.prompt,
+      word_to_draw: trial.word_to_draw,
       expTimer: -1,
       rt: -1,
-      file: trial.file
+      file: trial.file,
+      prefix: trial.prefix,
+      sufix: trial.suffix
     };
 
     let freeDrawing = {
       type: "free-drawing",
-      prompt: "hello",
+      prompt: trial.word_to_draw,
+      prefix: trial.prefix,
+      suffix: trial.suffix,
       timer: 60,
       on_finish: function(data) {
           
         console.log(data.responses);
+        response.image = data.drawing;
         response.rt = data.rt;
         response.expTimer = data.time_elapsed / 1000;
         trial_number++;
@@ -133,20 +109,14 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
           }
         });
 
-        let drawingResponse = {
-          image: data.drawing,
-          workerId: subjCode,
-          trial_number: 10,
-          prompt: "hello"
-        };
         // POST response data to server
         $.ajax({
           url: "http://" + document.domain + ":" + PORT + "/image",
           type: "POST",
           contentType: "application/json",
-          data: JSON.stringify(drawingResponse),
+          data: JSON.stringify(response),
           success: function() {
-            console.log(drawingResponse);
+            console.log(response);
           }
         })
       }

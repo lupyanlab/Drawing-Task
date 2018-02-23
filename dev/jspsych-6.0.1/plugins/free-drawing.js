@@ -11,11 +11,21 @@ jsPsych.plugins["free-drawing"] = (function () {
 		parameters: {
 			prompt: {
 				type: jsPsych.plugins.parameterType.STRING, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
-				default_value: undefined
+				default: undefined
 			},
 			timer: {
 				type: jsPsych.plugins.parameterType.INT, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
-				default_value: 60
+				default: 60
+			},
+			prefix: {
+				type: jsPsych.plugins.parameterType.STRING, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
+				default: '',
+				required: false
+			},
+			suffix: {
+				type: jsPsych.plugins.parameterType.STRING, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
+				default: '',
+				required: false
 			}
 		}
 	}
@@ -30,8 +40,10 @@ jsPsych.plugins["free-drawing"] = (function () {
 		let defaultWidth = 2;
 
 		display_element.innerHTML = `
-		<h1 id="timer">${Math.floor(trial.timer)}</h1>
-		<h1>${trial.prompt}</h1>
+		<h4><span id="timer">${Math.floor(trial.timer)}</span> seconds left</h4>
+		<h4>${trial.prefix}</h4>
+		<h1 style="margin-top:0px">${trial.prompt}</h1>
+		<h4>${trial.suffix}</h4>
 		<div class="free-drawing">
 		<canvas id="c" class="" width="${window.innerWidth * percentage}" height="${window.innerWidth * percentage}" style="border: 1px solid rgb(170, 170, 170); position: absolute; touch-action: none; user-select: none;" class="lower-canvas"></canvas>
 

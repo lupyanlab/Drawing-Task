@@ -9,11 +9,16 @@
     z-index:1;
 }
 
+canvas {
+    cursor: none !important;
+}
+
 #canvas{
       position:relative;
       width:800px;
       height:136.97px;  
     z-index:20;
+    pointer-events: none;
 }
 
 #audio-placeholder {
@@ -46,11 +51,4 @@
     background-color: #fff;
 }
 
-.survey {
-    text-align: left;
-}
-
-.free-drawing {
-    text-align: left;
-    display: flex;
-}
+  

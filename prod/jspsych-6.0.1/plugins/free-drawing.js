@@ -11,7 +11,21 @@ jsPsych.plugins["free-drawing"] = (function () {
 		parameters: {
 			prompt: {
 				type: jsPsych.plugins.parameterType.STRING, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
-				default_value: undefined
+				default: undefined
+			},
+			timer: {
+				type: jsPsych.plugins.parameterType.INT, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
+				default: 60
+			},
+			prefix: {
+				type: jsPsych.plugins.parameterType.STRING, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
+				default: '',
+				required: false
+			},
+			suffix: {
+				type: jsPsych.plugins.parameterType.STRING, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
+				default: '',
+				required: false
 			}
 		}
 	}
@@ -23,230 +37,218 @@ jsPsych.plugins["free-drawing"] = (function () {
 			parameter_name: 'parameter value'
 		};
 		let percentage = 0.4;
+		let defaultWidth = 2;
 
 		display_element.innerHTML = `
-		<h1>${trial.prompt}</h1>
+		<h4><span id="timer">${Math.floor(trial.timer)}</span> seconds left</h4>
+		<h4>${trial.prefix}</h4>
+		<h1 style="margin-top:0px">${trial.prompt}</h1>
+		<h4>${trial.suffix}</h4>
 		<div class="free-drawing">
 		<canvas id="c" class="" width="${window.innerWidth * percentage}" height="${window.innerWidth * percentage}" style="border: 1px solid rgb(170, 170, 170); position: absolute; touch-action: none; user-select: none;" class="lower-canvas"></canvas>
 
+		<canvas id="cursor" width="${window.innerWidth * percentage}" height="${window.innerWidth * percentage}"></canvas>
 			<div class="" style="display: inline-block; margin-left: 10px">
-				<button id="submit-drawing" class="btn btn-info">Submit Drawing</button><br>
-				<button id="drawing-mode" class="btn btn-info">Cancel drawing mode</button><br>
-				<button id="clear-canvas" class="btn btn-info">Clear</button><br>
 
 				<div id="drawing-mode-options" style="">
-					<label for="drawing-mode-selector">Mode:</label>
-					<select id="drawing-mode-selector">
-					<option>Pencil</option>
-					<option>Circle</option>
-					<option>Spray</option>
-					<option>Pattern</option>
-
-					<option>hline</option>
-					<option>vline</option>
-					<option>square</option>
-					<option>diamond</option>
-					<option>texture</option>
-					</select><br>
+					<button id="clear-canvas" class="btn btn-danger">Clear</button><br>
 
 					<label for="drawing-line-width">Line width:</label>
-					<span class="info">30</span><input type="range" value="30" min="0" max="150" id="drawing-line-width"><br>
+					<span class="info">${defaultWidth}</span><input type="range" value="${defaultWidth}" min="1" max="3" id="drawing-line-width"><br>
 
-					<label for="drawing-color">Line color:</label>
-					<input type="color" value="#005E7A" id="drawing-color"><br>
-
-					<label for="drawing-shadow-color">Shadow color:</label>
-					<input type="color" value="#005E7A" id="drawing-shadow-color"><br>
-
-					<label for="drawing-shadow-width">Shadow width:</label>
-					<span class="info">0</span><input type="range" value="0" min="0" max="50" id="drawing-shadow-width"><br>
-
-					<label for="drawing-shadow-offset">Shadow offset:</label>
-					<span class="info">0</span><input type="range" value="0" min="0" max="50" id="drawing-shadow-offset"><br>
+					<select name="colorpicker" id="drawing-color">
+						<option value="#000000">Black</option>
+						<option value="#ffffff" class="white">White</option>
+						<option value="#800080">Purple</option>
+						<option value="#0000FF">Blue</option>
+						<option value="#008000">Green</option>
+						<option value="#fbd75b">Yellow</option>
+						<option value="#ffb878">Orange</option>
+						<option value="#FF0000">Red</option>
+						<option value="#e1e1e1">Gray</option>
+					</select>
+					<br />
+					<br />
+					<br />
+					<br />
+				  
+					<button id="submit-drawing" class="btn btn-primary">Submit Drawing</button><br>
 				</div>
 			</div>
 			</div>`;
 
 
 
+		$('select[name="colorpicker"]').simplecolorpicker({
+			theme: 'regularfont'
+		});
+		
 		(function () {
+			const LINE_WIDTH_FACTOR = 5;
+			
 			var $ = function (id) { return document.getElementById(id) };
+			let countdownStarted = false;
+			let timer = trial.timer;
 
 			var canvas = this.__canvas = new fabric.Canvas('c', {
 				isDrawingMode: true,
-				backgroundColor : "#ffffff"
+				backgroundColor: "#ffffff"
 			});
 			fabric.Object.prototype.transparentCorners = false;
 
 			var drawingModeEl = $('drawing-mode'),
 				drawingOptionsEl = $('drawing-mode-options'),
 				drawingColorEl = $('drawing-color'),
-				drawingShadowColorEl = $('drawing-shadow-color'),
 				drawingLineWidthEl = $('drawing-line-width'),
-				drawingShadowWidth = $('drawing-shadow-width'),
-				drawingShadowOffset = $('drawing-shadow-offset'),
-				clearEl = $('clear-canvas'),
-				submitDrawing = $('submit-drawing');
+				clearEl = $('clear-canvas');
 
 			clearEl.onclick = function () { canvas.clear() };
-			submitDrawing.onclick = function () {
-				console.log('cick')
+
+
+			$('submit-drawing').onclick = () => {
 				jsPsych.finishTrial({
 					drawing: document.getElementById('c').toDataURL(),
 					prompt: trial.prompt
 				});
-			}
-
-			drawingModeEl.onclick = function () {
-				canvas.isDrawingMode = !canvas.isDrawingMode;
-				if (canvas.isDrawingMode) {
-					drawingModeEl.innerHTML = 'Cancel drawing mode';
-					drawingOptionsEl.style.display = '';
-				}
-				else {
-					drawingModeEl.innerHTML = 'Enter drawing mode';
-					drawingOptionsEl.style.display = 'none';
-				}
 			};
 
-			if (fabric.PatternBrush) {
-				var vLinePatternBrush = new fabric.PatternBrush(canvas);
-				vLinePatternBrush.getPatternSrc = function () {
-
-					var patternCanvas = fabric.document.createElement('canvas');
-					patternCanvas.width = patternCanvas.height = 10;
-					var ctx = patternCanvas.getContext('2d');
-
-					ctx.strokeStyle = this.color;
-					ctx.lineWidth = 5;
-					ctx.beginPath();
-					ctx.moveTo(0, 5);
-					ctx.lineTo(10, 5);
-					ctx.closePath();
-					ctx.stroke();
-
-					return patternCanvas;
-				};
-
-				var hLinePatternBrush = new fabric.PatternBrush(canvas);
-				hLinePatternBrush.getPatternSrc = function () {
-
-					var patternCanvas = fabric.document.createElement('canvas');
-					patternCanvas.width = patternCanvas.height = 10;
-					var ctx = patternCanvas.getContext('2d');
-
-					ctx.strokeStyle = this.color;
-					ctx.lineWidth = 5;
-					ctx.beginPath();
-					ctx.moveTo(5, 0);
-					ctx.lineTo(5, 10);
-					ctx.closePath();
-					ctx.stroke();
-
-					return patternCanvas;
-				};
-
-				var squarePatternBrush = new fabric.PatternBrush(canvas);
-				squarePatternBrush.getPatternSrc = function () {
-
-					var squareWidth = 10, squareDistance = 2;
-
-					var patternCanvas = fabric.document.createElement('canvas');
-					patternCanvas.width = patternCanvas.height = squareWidth + squareDistance;
-					var ctx = patternCanvas.getContext('2d');
-
-					ctx.fillStyle = this.color;
-					ctx.fillRect(0, 0, squareWidth, squareWidth);
-
-					return patternCanvas;
-				};
-
-				var diamondPatternBrush = new fabric.PatternBrush(canvas);
-				diamondPatternBrush.getPatternSrc = function () {
-
-					var squareWidth = 10, squareDistance = 5;
-					var patternCanvas = fabric.document.createElement('canvas');
-					var rect = new fabric.Rect({
-						width: squareWidth,
-						height: squareWidth,
-						angle: 45,
-						fill: this.color
-					});
-
-					var canvasWidth = rect.getBoundingRect().width;
-
-					patternCanvas.width = patternCanvas.height = canvasWidth + squareDistance;
-					rect.set({ left: canvasWidth / 2, top: canvasWidth / 2 });
-
-					var ctx = patternCanvas.getContext('2d');
-					rect.render(ctx);
-
-					return patternCanvas;
-				};
-			}
-
-			$('drawing-mode-selector').onchange = function () {
-
-				if (this.value === 'hline') {
-					canvas.freeDrawingBrush = vLinePatternBrush;
+			canvas.on({
+				'mouse:down': () => {
+					if (!countdownStarted) {
+						timer -= 0.01;
+						$('timer').innerHTML = Math.floor(timer);
+						let countdown = setInterval(() => {
+							timer -= 0.01;
+							if (timer < 0) {
+								clearInterval(countdown);
+								jsPsych.finishTrial({
+									drawing: document.getElementById('c').toDataURL(),
+									prompt: trial.prompt
+								});
+							}
+							else {
+								$('timer').innerHTML = Math.floor(timer);
+							}
+						}, 10)
+						countdownStarted = true;
+					}
 				}
-				else if (this.value === 'vline') {
-					canvas.freeDrawingBrush = hLinePatternBrush;
-				}
-				else if (this.value === 'square') {
-					canvas.freeDrawingBrush = squarePatternBrush;
-				}
-				else if (this.value === 'diamond') {
-					canvas.freeDrawingBrush = diamondPatternBrush;
-				}
-				else {
-					canvas.freeDrawingBrush = new fabric[this.value + 'Brush'](canvas);
-				}
+			})
 
-				if (canvas.freeDrawingBrush) {
-					canvas.freeDrawingBrush.color = drawingColorEl.value;
-					canvas.freeDrawingBrush.width = parseInt(drawingLineWidthEl.value, 10) || 1;
-					canvas.freeDrawingBrush.shadow = new fabric.Shadow({
-						blur: parseInt(drawingShadowWidth.value, 10) || 0,
-						offsetX: 0,
-						offsetY: 0,
-						affectStroke: true,
-						color: drawingShadowColorEl.value,
-					});
-				}
-			};
-
-			drawingColorEl.onchange = function () {
-				canvas.freeDrawingBrush.color = this.value;
-			};
-			drawingShadowColorEl.onchange = function () {
-				canvas.freeDrawingBrush.shadow.color = this.value;
-			};
-			drawingLineWidthEl.onchange = function () {
-				canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
-				this.previousSibling.innerHTML = this.value;
-			};
-			drawingShadowWidth.onchange = function () {
-				canvas.freeDrawingBrush.shadow.blur = parseInt(this.value, 10) || 0;
-				this.previousSibling.innerHTML = this.value;
-			};
-			drawingShadowOffset.onchange = function () {
-				canvas.freeDrawingBrush.shadow.offsetX = parseInt(this.value, 10) || 0;
-				canvas.freeDrawingBrush.shadow.offsetY = parseInt(this.value, 10) || 0;
-				this.previousSibling.innerHTML = this.value;
-			};
+			// drawingColorEl.onchange = function () {
+			// 	canvas.freeDrawingBrush.color = this.value;
+			// };
+			// drawingLineWidthEl.oninput = function () {
+			// 	canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
+			// 	this.previousSibling.innerHTML = this.value;
+			// };
 
 			if (canvas.freeDrawingBrush) {
 				canvas.freeDrawingBrush.color = drawingColorEl.value;
-				canvas.freeDrawingBrush.width = parseInt(drawingLineWidthEl.value, 10) || 1;
-				canvas.freeDrawingBrush.shadow = new fabric.Shadow({
-					blur: parseInt(drawingShadowWidth.value, 10) || 0,
-					offsetX: 0,
-					offsetY: 0,
-					affectStroke: true,
-					color: drawingShadowColorEl.value,
-				});
+				canvas.freeDrawingBrush.width = parseInt(drawingLineWidthEl.value, 10) * LINE_WIDTH_FACTOR || 1;
 			}
+
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			var cursor = new fabric.StaticCanvas("cursor");
+
+			// canvas.freeDrawingBrush.width = 20;
+			// canvas.freeDrawingBrush.color = '#ff0000';
+
+			var cursorOpacity = 1;
+			var mousecursor = new fabric.Circle({
+				left: -100,
+				top: -100,
+				radius: canvas.freeDrawingBrush.width / 2,
+				fill: "rgba(0,0,0," + cursorOpacity + ")",
+				stroke: "black",
+				originX: 'center',
+				originY: 'center'
+			});
+
+			cursor.add(mousecursor);
+
+			canvas.on('mouse:move', function (evt) {
+				var mouse = this.getPointer(evt.e);
+				mousecursor
+					.set({
+						top: mouse.y,
+						left: mouse.x
+					})
+					.setCoords()
+					.canvas.renderAll();
+			});
+
+			canvas.on('mouse:out', function () {
+				// put circle off screen
+				mousecursor
+					.set({
+						top: -1000,
+						left: -1000
+					})
+					.setCoords()
+					.canvas.renderAll();
+			});
+
+
+			//while brush size is changed
+			document.getElementById("drawing-line-width").oninput = function () {
+				this.previousSibling.innerHTML = this.value;
+				var size = this.value * LINE_WIDTH_FACTOR;
+				mousecursor
+					.center()
+					.set({
+						radius: size / 2
+					})
+					.setCoords()
+					.canvas.renderAll();
+			};
+
+			//after brush size has been changed
+			document.getElementById("drawing-line-width").onchange = function () {
+				canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
+				var size = parseInt(this.value, 10) * LINE_WIDTH_FACTOR;
+				canvas.freeDrawingBrush.width = size;
+				console.log(mousecursor)
+				mousecursor
+					.set({
+						left: -1000,
+						top: -1000,
+						radius: size / 2
+					})
+					.setCoords()
+					.canvas.renderAll();
+			};
+
+			//change drawing color
+			document.getElementById("drawing-color").onchange = function () {
+				canvas.freeDrawingBrush.color = this.value;
+				var bigint = parseInt(this.value.replace("#", ""), 16);
+				var r = (bigint >> 16) & 255;
+				var g = (bigint >> 8) & 255;
+				var b = bigint & 255;
+				mousecursor.set({
+					fill:"rgba(" + [r, g, b, cursorOpacity].join(",") + ")"
+				});
+			};
+
 		})();
 
 		// end trial
