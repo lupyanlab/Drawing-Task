@@ -44,7 +44,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
   let welcome_block = {
     type: "html-keyboard-response",
     choices: [32],
-    stimulus: `<h1>Easy To Adapt Task</h1>
+    stimulus: `<h1>Drawing</h1>
         <p class="lead">Welcome to the experiment. Thank you for participating! Press SPACE to begin.</p>`
   };
 
