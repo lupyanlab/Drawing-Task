@@ -165,7 +165,6 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
   };
   timeline.push(questionsInstructions);
 
-  // Please use DOUBLE QUOATES for wrapping strings below
   let demographicsQuestions = [
     {
       type: "radiogroup",

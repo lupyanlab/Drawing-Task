@@ -27,7 +27,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 			parameter_name: 'parameter value'
 		};
 		let percentage = 0.4;
-		let defaultWidth = 10;
+		let defaultWidth = 2;
 
 		display_element.innerHTML = `
 		<h1 id="timer">${Math.floor(trial.timer)}</h1>
@@ -42,7 +42,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 					<button id="clear-canvas" class="btn btn-danger">Clear</button><br>
 
 					<label for="drawing-line-width">Line width:</label>
-					<span class="info">${defaultWidth}</span><input type="range" value="${defaultWidth}" min="0" max="30" id="drawing-line-width"><br>
+					<span class="info">${defaultWidth}</span><input type="range" value="${defaultWidth}" min="1" max="3" id="drawing-line-width"><br>
 
 					<select name="colorpicker" id="drawing-color">
 						<option value="#000000">Black</option>
@@ -72,6 +72,8 @@ jsPsych.plugins["free-drawing"] = (function () {
 		});
 		
 		(function () {
+			const LINE_WIDTH_FACTOR = 5;
+			
 			var $ = function (id) { return document.getElementById(id) };
 			let countdownStarted = false;
 			let timer = trial.timer;
@@ -131,7 +133,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 
 			if (canvas.freeDrawingBrush) {
 				canvas.freeDrawingBrush.color = drawingColorEl.value;
-				canvas.freeDrawingBrush.width = parseInt(drawingLineWidthEl.value, 10) || 1;
+				canvas.freeDrawingBrush.width = parseInt(drawingLineWidthEl.value, 10) * LINE_WIDTH_FACTOR || 1;
 			}
 
 			
@@ -193,10 +195,11 @@ jsPsych.plugins["free-drawing"] = (function () {
 					.canvas.renderAll();
 			});
 
+
 			//while brush size is changed
 			document.getElementById("drawing-line-width").oninput = function () {
 				this.previousSibling.innerHTML = this.value;
-				var size = this.value;
+				var size = this.value * LINE_WIDTH_FACTOR;
 				mousecursor
 					.center()
 					.set({
@@ -209,7 +212,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 			//after brush size has been changed
 			document.getElementById("drawing-line-width").onchange = function () {
 				canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
-				var size = parseInt(this.value, 10);
+				var size = parseInt(this.value, 10) * LINE_WIDTH_FACTOR;
 				canvas.freeDrawingBrush.width = size;
 				console.log(mousecursor)
 				mousecursor
