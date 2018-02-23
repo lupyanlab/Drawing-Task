@@ -110,7 +110,8 @@ jsPsych.plugins["free-drawing"] = (function () {
 				clearInterval(countdown);
 				jsPsych.finishTrial({
 					drawing: document.getElementById('c').toDataURL(),
-					prompt: trial.prompt
+					prompt: trial.prompt,
+					drawing_time: 60-timer
 				});
 			};
 
@@ -125,7 +126,8 @@ jsPsych.plugins["free-drawing"] = (function () {
 								clearInterval(countdown);
 								jsPsych.finishTrial({
 									drawing: document.getElementById('c').toDataURL(),
-									prompt: trial.prompt
+									prompt: trial.prompt,
+									drawing_time: 60
 								});
 							}
 							else {

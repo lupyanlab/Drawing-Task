@@ -171,7 +171,6 @@ app.post('/image', function (req, res, next) {
 
   // Create new data folder if does not exist
   let response = req.body;
-  console.log(response);
   fs.access('./data', (err) => {
     if (err && err.code === 'ENOENT') {
       fs.mkdir('./data', () => {
@@ -197,9 +196,10 @@ app.post('/image', function (req, res, next) {
   (req, res, next) => {
     // save as png
     let response = req.body;
-    var base64Data = response.image.replace(/^data:image\/png;base64,/, "");
+    console.log(Object.keys(response))
+    var base64Data = response.drawing.replace(/^data:image\/png;base64,/, "");
 
-    fs.writeFile('./data/' + response.workerId+'/'+response.workerId+'_'+response.prompt+'_'+response.trial_number+'.png', base64Data, 'base64', function (err) {
+    fs.writeFile('./data/' + response.workerId+'/'+response.workerId+'_'+response.word_to_draw+'_'+response.trial_number+'.png', base64Data, 'base64', function (err) {
       if (err) {
         res.send({ success: false });
         return next(err);

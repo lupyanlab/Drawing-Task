@@ -33,7 +33,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
 
   // declare the block.
   var consent = {
-    type: "html",
+    type: "external-html",
     url: "./consent.html",
     cont_btn: "start",
     check_fn: check_consent
@@ -74,10 +74,11 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     // Empty Response Data to be sent to be collected
     let response = {
       workerId: subjCode,
-      trialNum: trial_number,
+      trial_number: trial_number,
       word_to_draw: trial.word_to_draw,
       expTimer: -1,
-      rt: -1,
+      total_time_elapsed: -1,
+      drawing_time: -1,
       file: trial.file,
       prefix: trial.prefix,
       sufix: trial.suffix
@@ -91,12 +92,10 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       timer: 60,
       on_finish: function(data) {
           
-        console.log(data.responses);
-        response.image = data.drawing;
-        response.rt = data.rt;
+        console.log(data);
+        response.total_time_elapsed = data.time_elapsed/1000;
+        response.drawing_time = data.drawing_time;
         response.expTimer = data.time_elapsed / 1000;
-        trial_number++;
-        jsPsych.setProgressBar((trial_number - 1) / num_trials);
         console.log(response);
 
         // POST response data to server
@@ -115,11 +114,13 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
           url: "http://" + document.domain + ":" + PORT + "/image",
           type: "POST",
           contentType: "application/json",
-          data: JSON.stringify(response),
+          data: JSON.stringify({drawing: data.drawing, workerId: subjCode, word_to_draw: trial.word_to_draw, trial_number}),
           success: function(data) {
             console.log(data);
           }
         })
+        trial_number++;
+        jsPsych.setProgressBar((trial_number - 1) / num_trials);
       }
     };
     timeline.push(freeDrawing);
