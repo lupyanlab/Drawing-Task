@@ -89,6 +89,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 			var $ = function (id) { return document.getElementById(id) };
 			let countdownStarted = false;
 			let timer = trial.timer;
+			let countdown;
 
 			var canvas = this.__canvas = new fabric.Canvas('c', {
 				isDrawingMode: true,
@@ -106,6 +107,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 
 
 			$('submit-drawing').onclick = () => {
+				clearInterval(countdown);
 				jsPsych.finishTrial({
 					drawing: document.getElementById('c').toDataURL(),
 					prompt: trial.prompt
@@ -117,7 +119,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 					if (!countdownStarted) {
 						timer -= 0.01;
 						$('timer').innerHTML = Math.floor(timer);
-						let countdown = setInterval(() => {
+						countdown = setInterval(() => {
 							timer -= 0.01;
 							if (timer < 0) {
 								clearInterval(countdown);
