@@ -1,5 +1,5 @@
 // Function Call to Run the experiment
-function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitId, sessionId) {
+function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitId) {
   let timeline = [];
 
   // Data that is collected for jsPsych
@@ -107,7 +107,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       prompt: trial.prompt,
       expTimer: -1,
       rt: -1,
-      sessionId
+      file: trial.file
     };
 
     let freeDrawing = {

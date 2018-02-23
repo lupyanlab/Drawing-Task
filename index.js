@@ -44,14 +44,21 @@ app.post('/trials', function (req, res, next) {
   let sessionId = req.body.sessionId;
   console.log(req.body);
 
-  jsonfile.readFile('./trials/' + sessionId + '.json', (err, json) => {
-    if (err) {
-      res.send({ success: false });
-      return next(err);
-    }
-    let trials = json.trials;
-    console.log(trials)
-    res.send({ success: true, trials: trials});
+  let trials = [];
+  fs.readdir('./trials', (err, filenames) => {
+    let filename = filenames[Math.floor(Math.random()*filenames.length)];
+    csv({delimiter: ','})
+    .fromFile('./trials/'+filename)
+    .on('json',(jsonObj)=>{
+        trials.push(jsonObj);
+    })
+    .on('done',(error)=>{
+      trials.forEach((trial) => {
+        trial.file = filename;
+      });
+      console.log(trials)
+      res.send({ success: true, trials: trials });
+    })
   })
 })
 
