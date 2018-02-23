@@ -31,32 +31,6 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     return false;
   };
 
-//   let freeDrawing = {
-//     type: "free-drawing",
-//     prompt: "hello",
-//     timer: 60,
-//     on_finish: function(data) {
-//       let response = {
-//         image: data.drawing,
-//         workerId: subjCode,
-//         trial_number: 10,
-//         prompt: "hello"
-//       };
-//       // POST response data to server
-//       $.ajax({
-//         url: "http://" + document.domain + ":" + PORT + "/image",
-//         type: "POST",
-//         contentType: "application/json",
-//         data: JSON.stringify(response),
-//         success: function() {
-//           console.log(response);
-//         }
-//       });
-//     }
-//   };
-
-//   timeline.push(freeDrawing);
-
   // declare the block.
   var consent = {
     type: "html",
@@ -123,6 +97,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
         response.expTimer = data.time_elapsed / 1000;
         trial_number++;
         jsPsych.setProgressBar((trial_number - 1) / num_trials);
+        console.log(response);
 
         // POST response data to server
         $.ajax({
@@ -130,8 +105,8 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
           type: "POST",
           contentType: "application/json",
           data: JSON.stringify(response),
-          success: function() {
-            console.log(response);
+          success: function(data) {
+            console.log(data);
           }
         });
 
@@ -141,8 +116,8 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
           type: "POST",
           contentType: "application/json",
           data: JSON.stringify(response),
-          success: function() {
-            console.log(response);
+          success: function(data) {
+            console.log(data);
           }
         })
       }

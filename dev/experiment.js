@@ -97,6 +97,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
         response.expTimer = data.time_elapsed / 1000;
         trial_number++;
         jsPsych.setProgressBar((trial_number - 1) / num_trials);
+        console.log(response);
 
         // POST response data to server
         $.ajax({
@@ -104,8 +105,8 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
           type: "POST",
           contentType: "application/json",
           data: JSON.stringify(response),
-          success: function() {
-            console.log(response);
+          success: function(data) {
+            console.log(data);
           }
         });
 
@@ -115,8 +116,8 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
           type: "POST",
           contentType: "application/json",
           data: JSON.stringify(response),
-          success: function() {
-            console.log(response);
+          success: function(data) {
+            console.log(data);
           }
         })
       }
