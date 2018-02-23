@@ -40,7 +40,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 		let defaultWidth = 2;
 
 		display_element.innerHTML = `
-		<h4><span id="timer">${Math.floor(trial.timer)}</span> seconds left</h4>
+		<div id="timer-container"><h4>You have 60 seconds to draw.</h4></div>
 		<h4>${trial.prefix}</h4>
 		<h1 style="margin-top:0px">${trial.prompt}</h1>
 		<h4>${trial.suffix}</h4>
@@ -119,7 +119,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 				'mouse:down': () => {
 					if (!countdownStarted) {
 						timer -= 0.01;
-						$('timer').innerHTML = Math.floor(timer);
+						$('timer-container').innerHTML = `<h4>You have <span id="timer">${Math.floor(timer)}</span> seconds left...</h4>`;
 						countdown = setInterval(() => {
 							timer -= 0.01;
 							if (timer < 0) {
@@ -131,7 +131,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 								});
 							}
 							else {
-								$('timer').innerHTML = Math.floor(timer);
+								$('timer-container').innerHTML = `<h4>You have <span id="timer">${Math.floor(timer)}</span> seconds left...</h4>`;
 							}
 						}, 10)
 						countdownStarted = true;
