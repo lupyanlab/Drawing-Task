@@ -36,7 +36,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 		var trial_data = {
 			parameter_name: 'parameter value'
 		};
-		let percentage = 0.4;
+		let percentage = 0.3;
 		let defaultWidth = 2;
 
 		display_element.innerHTML = `

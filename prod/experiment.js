@@ -44,8 +44,8 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
   let welcome_block = {
     type: "html-keyboard-response",
     choices: [32],
-    stimulus: `<h1>Drawing</h1>
-        <p class="lead">Welcome to the experiment. Thank you for participating! Press SPACE to begin.</p>`
+    stimulus: `<h1>Thank you for accepting the HIT!</h1>
+        <p class="lead">The next screen will show you the instructions. Press SPACE to begin.</p>`
   };
 
   timeline.push(welcome_block);
@@ -58,7 +58,11 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     key_forward: "space",
     key_backward: "backspace",
     pages: [
-      `<p class="lead">Insert Instructions
+      `<p class="lead">In this HIT you will be asked to draw some creatures. 
+      Some of them correspond to real animals (like a rabbit). Most, however, are imaginary. 
+      For example, you might be asked to draw a "sask". Sound out the word and use your imagination 
+      about what a creature with this name would look like. You will have 60 seconds from the time you begin drawing
+      to complete each drawing. 
             </p> ${continue_space}`
     ]
   };
@@ -131,19 +135,46 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     key_forward: "space",
     key_backward: "backspace",
     pages: [
-      `<p class="lead">This is a filler for instructions for the questions.
+      `<p class="lead">Thanks! We'll now ask you some demographic questions and we'll be all done!
             </p> ${continue_space}`
     ]
   };
   timeline.push(questionsInstructions);
 
   let demographicsQuestions = [
+
+    {
+      type: "radiogroup",
+      name: "drawing_implement",
+      isRequired: true,
+      title: "What did you use to draw?",
+      choices: ["Mouse", "Laptop trackpad", "Stylus", "Finger"]
+    },
+
+
+    {
+      type: "radiogroup",
+      name: "artclass",
+      isRequired: true,
+      title: "Have you taken any drawing classes?",
+      choices: ["Yes", "No"]
+    },
+
+    {
+      type: "radiogroup",
+      name: "artskill",
+      isRequired: true,
+      title: "Would you consider yourself skilled at drawing?",
+      choices: ["1-Not at all", "2-Slightly", "3-Moderately skilled", "4-Highly skilled"]
+    },
+
+
     {
       type: "radiogroup",
       name: "gender",
       isRequired: true,
       title: "What is your gender?",
-      choices: ["Male", "Female", "Other", "Perfer not to say"]
+      choices: ["Male", "Female", "Other", "Prefer not to say"]
     },
 
     {
@@ -172,16 +203,16 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       type: "radiogroup",
       name: "degree",
       isRequired: true,
-      title: "What is the highest degree or level of shcool you have completed/ If currently enrolled, highest degree received.",
+      title: "What is the highest degree or level of school you have completed/ If currently enrolled, please indicate highest degree received.",
       choices: [
-        "Less than high school",
-        "High school diploma",
-        "Some college, no degree",
+        "lt_highschool|Less than high school",
+        "highSchool|High school diploma",
+        "somecollege|Some college, no degree",
         "associates|Associate's degree",
         "bachelors|Bachelor's degree",
         "masters|Master's degree",
-        "PhD, law, or medical degree",
-        "Prefer not to say"
+        "terminal|PhD, law, or medical degree",
+        "noResp|Prefer not to say"
       ]
     },
     {
@@ -193,13 +224,13 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     {
       type: "text",
       name: "college",
-      visibleIf: "{degree}='associates' or {degree}='bachelors' or {degree}='masters' or {degree}='PhD, law, or medical degree'",
+      visibleIf: "{degree}='associates' or {degree}='bachelors' or {degree}='masters' or {degree}='terminal'",
       title: "What did you study in college?"
     },
     {
       type: "text",
       name: "grad",
-      visibleIf: "{degree}='masters' or {degree}='PhD, law, or medical degree'",
+      visibleIf: "{degree}='masters' or {degree}='terminal'",
       title: "What did you study in graduate school?"
     }
   ];
@@ -222,14 +253,12 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
 
       let endmessage = `
                 <p class="lead">Thank you for participating! Your completion code is ${participantID}. Copy and paste this in 
-                MTurk to get paid. If you have any questions or comments, please email jsulik@wisc.edu.</p>
+                MTurk to get paid. If you have any questions or comments, please email lupyan@wisc.edu.</p>
                 
                 <h3>Debriefing </h3>
                 <p class="lead">
-                Thank you for your participation. The study is designed to collect information about the different ways 
-                in which people typically represent thoughts in their mind. The responses will be used in the 
-                development of a shorter questionnaire to assess differences in these representations. 
-                </p>
+                This nonsense words that you were asked to draw contain combinations of sounds that are predicted to elicit drawings that contain certain properties such as smoothness and sharpness. By subjecting the drawings to machine-vision analysis and by having them rated by other people, we gain a better idea of how the sounds we hear as part of our language influence perceptual processing. Thanks again for participating!
+		</p>
                 `;
       jsPsych.endExperiment(endmessage);
     }
