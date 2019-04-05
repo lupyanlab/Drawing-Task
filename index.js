@@ -56,8 +56,11 @@ app.post('/trials', function (req, res, next) {
       trials.forEach((trial) => {
         trial.file = filename;
       });
+
+      let questions = _.shuffle(fs.readFileSync('IRQ_questions.txt').toString().replace(/\r/g, '\n').split('\n')).filter((line) => {return line.replace(/ /g, '').length > 0 });
+
       console.log(trials)
-      res.send({ success: true, trials: trials });
+      res.send({ success: true, trials: trials, questions });
     })
   })
 })
@@ -208,3 +211,20 @@ app.post('/image', function (req, res, next) {
     });
   });
 
+  // POST endpoint for receiving trial responses
+app.post('/IRQ', function (req, res) {
+  console.log('IRQ post request received');
+
+  // Parses the trial response data to csv
+  let IRQ = req.body;
+  console.log(IRQ);
+  let path = 'IRQ/' + IRQ.subjCode + '_IRQ.csv';
+  let headers = Object.keys(IRQ);
+  writer = csvWriter({ headers: headers });
+
+  writer.pipe(fs.createWriteStream(path, { flags: 'w' }));
+  writer.write(IRQ);
+  writer.end();
+
+  res.send({ success: true });
+})

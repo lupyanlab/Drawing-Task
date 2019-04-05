@@ -63,7 +63,39 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     ]
   };
 
-  timeline.push(instructions);
+  // timeline.push(instructions);
+
+
+  window.questions = questions;    // allow surveyjs to access questions
+  const IRQTrial = {
+    type: 'external-html',
+    url: './IRQ/IRQ.html',
+    cont_btn: "IRQ-cmplt",
+    execute_script: true,
+    check_fn: function() {
+        if(IRQIsCompleted()) {
+            console.log(getIRQResponses());
+            const IRQ = Object.assign({subjCode}, getIRQResponses().answers);
+            // POST demographics data to server
+            $.ajax({
+                url: 'http://' + document.domain + ':' + PORT + '/IRQ',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(IRQ),
+                success: function (data) {
+                    // console.log(data);
+                    // $('#surveyElement').remove();
+                    // $('#surveyResult').remove();
+                }
+            })
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+  };
+  timeline.push(IRQTrial);
 
   let trial_number = 1;
   let num_trials = trials.length;
