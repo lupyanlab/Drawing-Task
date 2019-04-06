@@ -57,10 +57,17 @@ app.post('/trials', function (req, res, next) {
         trial.file = filename;
       });
 
+      // Parses to lines of questions to a shuffled array of questions
       let questions = _.shuffle(fs.readFileSync('IRQ_questions.txt').toString().replace(/\r/g, '\n').split('\n')).filter((line) => {return line.replace(/ /g, '').length > 0 });
+      let ReadingQu = fs.readFileSync('ReadingQu.txt').toString().replace(/\r/g, '\n').split('\n').filter((line) => {return line.replace(/ /g, '').length > 0 });
+      // Randomize Reading in my spare time is something batch and then the rest of the batch.
+      ReadingQu = [
+        ..._.shuffle(ReadingQu.filter(q => q.startsWith('Reading in my spare time is something:'))), 
+        ..._.shuffle(ReadingQu.filter(q => !q.startsWith('Reading in my spare time is something:'))),
+      ];
 
       console.log(trials)
-      res.send({ success: true, trials: trials, questions });
+      res.send({ success: true, trials: trials, questions, ReadingQu });
     })
   })
 })
@@ -218,12 +225,36 @@ app.post('/IRQ', function (req, res) {
   // Parses the trial response data to csv
   let IRQ = req.body;
   console.log(IRQ);
+  if (!fs.existsSync('IRQ')) {
+    fs.mkdirSync('IRQ');
+  }
   let path = 'IRQ/' + IRQ.subjCode + '_IRQ.csv';
   let headers = Object.keys(IRQ);
   writer = csvWriter({ headers: headers });
 
   writer.pipe(fs.createWriteStream(path, { flags: 'w' }));
   writer.write(IRQ);
+  writer.end();
+
+  res.send({ success: true });
+})
+
+// POST endpoint for receiving trial responses
+app.post('/ReadingQu', function (req, res) {
+  console.log('ReadingQu post request received');
+
+  // Parses the trial response data to csv
+  let ReadingQu = req.body;
+  console.log(ReadingQu);
+  if (!fs.existsSync('ReadingQu')) {
+    fs.mkdirSync('ReadingQu');
+  }
+  let path = 'ReadingQu/' + ReadingQu.subjCode + '_ReadingQu.csv';
+  let headers = Object.keys(ReadingQu);
+  writer = csvWriter({ headers: headers });
+
+  writer.pipe(fs.createWriteStream(path, { flags: 'w' }));
+  writer.write(ReadingQu);
   writer.end();
 
   res.send({ success: true });

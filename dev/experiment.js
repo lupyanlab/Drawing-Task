@@ -1,5 +1,5 @@
 // Function Call to Run the experiment
-function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitId) {
+function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitId, ReadingQu) {
   let timeline = [];
 
   // Data that is collected for jsPsych
@@ -96,6 +96,37 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     }
   };
   timeline.push(IRQTrial);
+
+  window.questions = ReadingQu;    // allow surveyjs to access questions
+  const ReadingQuTrial = {
+    type: 'external-html',
+    url: './ReadingQu/ReadingQu.html',
+    cont_btn: "ReadingQu-cmplt",
+    execute_script: true,
+    check_fn: function() {
+        if(ReadingQuIsCompleted()) {
+            console.log(getReadingQuResponses());
+            const ReadingQu = Object.assign({subjCode}, getReadingQuResponses().answers);
+            // POST demographics data to server
+            $.ajax({
+                url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(ReadingQu),
+                success: function (data) {
+                    // console.log(data);
+                    // $('#surveyElement').remove();
+                    // $('#surveyResult').remove();
+                }
+            })
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+  };
+  timeline.push(ReadingQuTrial);
 
   let trial_number = 1;
   let num_trials = trials.length;

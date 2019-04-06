@@ -29,7 +29,7 @@ $(document).ready(function(){
                 
                 $('#loading').remove();
                 // jsPsych.pluginAPI.preloadImages(images, function(){}); 
-                runExperiment(data.trials, subjCode, data.questions, workerId, assignmentId, hitId);
+                runExperiment(data.trials, subjCode, data.questions, workerId, assignmentId, hitId, data.ReadingQu);
     
             }
         })    
