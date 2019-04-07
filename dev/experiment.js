@@ -80,6 +80,19 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
         data: JSON.stringify(demographics),
         success: function() {}
       });
+
+      let endmessage = `
+                <p class="lead">Thank you for participating! Your completion code is ${participantID}. Copy and paste this in 
+                MTurk to get paid. If you have any questions or comments, please email lupyan@wisc.edu.</p>
+                
+                <h3>Debriefing </h3>
+                <p class="lead">
+                Thank you for your participation. The study is designed to collect information about the different ways 
+                in which people typically represent thoughts in their mind. The responses will be used in the 
+                development of a shorter questionnaire to assess differences in these representations. 
+                </p>
+                `;
+      jsPsych.endExperiment(endmessage);
     }
   };
   timeline.push(demographicsTrial);
@@ -95,6 +108,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
         if(IRQIsCompleted()) {
             console.log(getIRQResponses());
             const IRQ = Object.assign({subjCode}, getIRQResponses().answers);
+            // POST demographics data to server
             $.ajax({
                 url: 'http://' + document.domain + ':' + PORT + '/IRQ',
                 type: 'POST',
@@ -125,6 +139,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
         if(ReadingQuIsCompleted()) {
             console.log(getReadingQuResponses());
             const ReadingQu = Object.assign({subjCode}, getReadingQuResponses().answers);
+            // POST demographics data to server
             $.ajax({
                 url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
                 type: 'POST',
@@ -206,25 +221,16 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     timeline.push(freeDrawing);
     }
 
-  let endMessage = {
+  let questionsInstructions = {
     type: "instructions",
-    key_forward: "",
-    key_backward: "",
+    key_forward: "space",
+    key_backward: "backspace",
     pages: [
-      `
-        <p class="lead">Thank you for participating! Your completion code is ${participantID}. Copy and paste this in 
-        MTurk to get paid. If you have any questions or comments, please email lupyan@wisc.edu.</p>
-        
-        <h3>Debriefing </h3>
-        <p class="lead">
-        Thank you for your participation. The study is designed to collect information about the different ways 
-        in which people typically represent thoughts in their mind. The responses will be used in the 
-        development of a shorter questionnaire to assess differences in these representations. 
-        </p>
-        `
-    ],
+      `<p class="lead">This is a filler for instructions for the questions.
+            </p> ${continue_space}`
+    ]
   };
-  timeline.push(endMessage);
+  timeline.push(questionsInstructions);
 
   let images = [];
   // add scale pic paths to images that need to be loaded
