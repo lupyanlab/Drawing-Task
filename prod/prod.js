@@ -1,4 +1,4 @@
-const PORT = 7082;
+const PORT = 7100;
 const FULLSCREEN = true;
 $(document).ready(function(){
 
