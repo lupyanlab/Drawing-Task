@@ -20,7 +20,8 @@
   },
   "devDependencies": {
     "gulp": "^3.9.1",
-    "gulp-html-replace": "^1.6.2"
+    "gulp-html-replace": "^1.6.2",
+    "nodemon": "^1.18.10"
   },
   "repository": {
     "type": "git",
