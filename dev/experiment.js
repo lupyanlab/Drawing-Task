@@ -63,7 +63,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     ]
   };
 
-  // timeline.push(instructions);
+  timeline.push(instructions);
 
 
   window.questions = questions;    // allow surveyjs to access questions
