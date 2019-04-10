@@ -59,15 +59,11 @@ app.post('/trials', function (req, res, next) {
 
       // Parses to lines of questions to a shuffled array of questions
       let questions = _.shuffle(fs.readFileSync('IRQ_questions.txt').toString().replace(/\r/g, '\n').split('\n')).filter((line) => {return line.replace(/ /g, '').length > 0 });
-      let ReadingQu = fs.readFileSync('ReadingQu.txt').toString().replace(/\r/g, '\n').split('\n').filter((line) => {return line.replace(/ /g, '').length > 0 });
-      // Randomize Reading in my spare time is something batch and then the rest of the batch.
-      ReadingQu = [
-        ..._.shuffle(ReadingQu.filter(q => q.startsWith('Reading in my spare time is something:'))), 
-        ..._.shuffle(ReadingQu.filter(q => !q.startsWith('Reading in my spare time is something:'))),
-      ];
+      let ReadingQu1 = _.shuffle(fs.readFileSync('reading_questions_1.txt').toString().replace(/\r/g, '\n').split('\n').filter((line) => {return line.replace(/ /g, '').length > 0 }));
+      let ReadingQu2 = _.shuffle(fs.readFileSync('reading_questions_2.txt').toString().replace(/\r/g, '\n').split('\n').filter((line) => {return line.replace(/ /g, '').length > 0 }));
 
       console.log(trials)
-      res.send({ success: true, trials: trials, questions, ReadingQu });
+      res.send({ success: true, trials: trials, questions, ReadingQu: [ReadingQu1, ReadingQu2] });
     })
   })
 })
@@ -164,11 +160,11 @@ app.post('/demographics', function (req, res, next) {
     let demographics = req.body;
     let path = 'demographics/' + demographics.subjCode + '_demographics.csv';
 
-    let headers = Object.keys(demographics);
+    let headers = Object.keys(demographics.responses);
     writer = csvWriter({ headers: headers });
 
     writer.pipe(fs.createWriteStream(path, { flags: 'w' }));
-    writer.write(demographics);
+    writer.write(demographics.responses);
     writer.end();
 
     res.send({ success: true });
@@ -229,11 +225,11 @@ app.post('/IRQ', function (req, res) {
     fs.mkdirSync('IRQ');
   }
   let path = 'IRQ/' + IRQ.subjCode + '_IRQ.csv';
-  let headers = Object.keys(IRQ);
+  let headers = Object.keys(IRQ.responses);
   writer = csvWriter({ headers: headers });
 
   writer.pipe(fs.createWriteStream(path, { flags: 'w' }));
-  writer.write(IRQ);
+  writer.write(IRQ.responses);
   writer.end();
 
   res.send({ success: true });
@@ -249,12 +245,17 @@ app.post('/ReadingQu', function (req, res) {
   if (!fs.existsSync('ReadingQu')) {
     fs.mkdirSync('ReadingQu');
   }
-  let path = 'ReadingQu/' + ReadingQu.subjCode + '_ReadingQu.csv';
-  let headers = Object.keys(ReadingQu);
+  let path;
+  if (ReadingQu.batch === 1) {
+    path = 'ReadingQu/' + ReadingQu.subjCode + '_ReadingQu1.csv';
+  } else if (ReadingQu.batch === 2) {
+    path = 'ReadingQu/' + ReadingQu.subjCode + '_ReadingQu2.csv';
+  }
+  let headers = Object.keys(ReadingQu.responses);
   writer = csvWriter({ headers: headers });
 
   writer.pipe(fs.createWriteStream(path, { flags: 'w' }));
-  writer.write(ReadingQu);
+  writer.write(ReadingQu.responses);
   writer.end();
 
   res.send({ success: true });

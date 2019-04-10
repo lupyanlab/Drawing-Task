@@ -41,6 +41,56 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
 
   timeline.push(consent);
 
+  const scale = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'];
+  var IRQTrial = {
+    type: 'survey-likert',
+    questions: questions.map(q => ({prompt: q, labels: scale, required: true})),
+    on_finish: function (data) {
+      const responses = Object.values(JSON.parse(data.responses)).reduce((acc, response, i) => ({ ...acc, [questions[i]]: scale[response] }), {});
+      console.log(responses);
+      $.ajax({
+          url: 'http://' + document.domain + ':' + PORT + '/IRQ',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ subjCode, responses }),
+      })
+    }
+  };
+  timeline.push(IRQTrial);
+
+  var otherQuestionsTrial = {
+    type: 'survey-likert',
+    questions: ReadingQu[0].map(q => ({prompt: q, labels: scale, required: true})),
+    on_finish: function (data) {
+      const responses = Object.values(JSON.parse(data.responses)).reduce((acc, response, i) => ({ ...acc, [ReadingQu[0][i]]: scale[response] }), {});
+      console.log(responses);
+      $.ajax({
+          url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ subjCode, responses, batch: 1 }),
+      })
+    }
+  };
+  timeline.push(otherQuestionsTrial);
+
+  var readingQuestionsTrial = {
+    type: 'survey-likert',
+    preamble: 'Reading in my spare time is something:',
+    questions: ReadingQu[1].map(q => ({prompt: q, labels: scale, required: true})),
+    on_finish: function (data) {
+      const responses = Object.values(JSON.parse(data.responses)).reduce((acc, response, i) => ({ ...acc, [ReadingQu[1][i]]: scale[response] }), {});
+      console.log(responses);
+      $.ajax({
+          url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ subjCode, responses, batch: 2 }),
+      })
+    }
+  };
+  timeline.push(readingQuestionsTrial);
+
   let welcome_block = {
     type: "html-keyboard-response",
     choices: [32],
@@ -133,93 +183,30 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     on_finish: function(data) {
       let demographicsResponses = data.response;
       console.log(demographicsResponses);
-      let demographics = Object.assign({ subjCode }, demographicsResponses);
       // POST demographics data to server
       $.ajax({
         url: "http://" + document.domain + ":" + PORT + "/demographics",
         type: "POST",
         contentType: "application/json",
-        data: JSON.stringify(demographics),
+        data: JSON.stringify({ subjCode, responses: demographicsResponses }),
         success: function() {}
       });
 
+      let endmessage = `
+                <p class="lead">Thank you for participating! Your completion code is ${participantID}. Copy and paste this in 
+                MTurk to get paid. If you have any questions or comments, please email lupyan@wisc.edu.</p>
+                
+                <h3>Debriefing </h3>
+                <p class="lead">
+                Thank you for your participation. The study is designed to collect information about the different ways 
+                in which people typically represent thoughts in their mind. The responses will be used in the 
+                development of a shorter questionnaire to assess differences in these representations. 
+                </p>
+                `;
+      jsPsych.endExperiment(endmessage);
     }
   };
   timeline.push(demographicsTrial);
-
-    window.questions = questions;    // allow surveyjs to access questions
-    const IRQTrial = {
-      type: 'external-html',
-      url: './IRQ/IRQ.html',
-      cont_btn: "IRQ-cmplt",
-      execute_script: true,
-      check_fn: function() {
-          if(IRQIsCompleted()) {
-              console.log(getIRQResponses());
-              const IRQ = Object.assign({subjCode}, getIRQResponses().answers);
-              // POST demographics data to server
-              $.ajax({
-                  url: 'http://' + document.domain + ':' + PORT + '/IRQ',
-                  type: 'POST',
-                  contentType: 'application/json',
-                  data: JSON.stringify(IRQ),
-                  success: function (data) {
-                      // console.log(data);
-                      // $('#surveyElement').remove();
-                      // $('#surveyResult').remove();
-                  }
-              })
-              return true;
-          }
-          else {
-              return false;
-          }
-      }
-    };
-    timeline.push(IRQTrial);
-  
-    window.questions = ReadingQu;    // allow surveyjs to access questions
-    const ReadingQuTrial = {
-      type: 'external-html',
-      url: './ReadingQu/ReadingQu.html',
-      cont_btn: "ReadingQu-cmplt",
-      execute_script: true,
-      check_fn: function() {
-          if(ReadingQuIsCompleted()) {
-              console.log(getReadingQuResponses());
-              const ReadingQu = Object.assign({subjCode}, getReadingQuResponses().answers);
-              // POST demographics data to server
-              $.ajax({
-                  url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
-                  type: 'POST',
-                  contentType: 'application/json',
-                  data: JSON.stringify(ReadingQu),
-                  success: function (data) {
-                      // console.log(data);
-                      // $('#surveyElement').remove();
-                      // $('#surveyResult').remove();
-                  }
-              })
-              let endmessage = `
-                        <p class="lead">Thank you for participating! Your completion code is ${participantID}. Copy and paste this in 
-                        MTurk to get paid. If you have any questions or comments, please email lupyan@wisc.edu.</p>
-                        
-                        <h3>Debriefing </h3>
-                        <p class="lead">
-                        Thank you for your participation. The study is designed to collect information about the different ways 
-                        in which people typically represent thoughts in their mind. The responses will be used in the 
-                        development of a shorter questionnaire to assess differences in these representations. 
-                        </p>
-                        `;
-              jsPsych.endExperiment(endmessage);
-              return true;
-          }
-          else {
-              return false;
-          }
-      }
-    };
-    timeline.push(ReadingQuTrial);
 
   let images = [];
   // add scale pic paths to images that need to be loaded
