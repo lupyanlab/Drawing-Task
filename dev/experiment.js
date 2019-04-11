@@ -45,6 +45,10 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
   var IRQTrial = {
     type: 'survey-likert',
     questions: questions.map(q => ({prompt: q, labels: scale, required: true})),
+    on_start: function() {
+      const top = document.getElementById('jspsych-progressbar-container');
+      top.scrollIntoView(true);
+    },
     on_finish: function (data) {
       const responses = Object.values(JSON.parse(data.responses)).reduce((acc, response, i) => ({ ...acc, [questions[i]]: scale[response] }), {});
       console.log(responses);
@@ -61,6 +65,10 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
   var otherQuestionsTrial = {
     type: 'survey-likert',
     questions: ReadingQu[0].map(q => ({prompt: q, labels: scale, required: true})),
+    on_start: function() {
+      const top = document.getElementById('jspsych-progressbar-container');
+      top.scrollIntoView(true);
+    },
     on_finish: function (data) {
       const responses = Object.values(JSON.parse(data.responses)).reduce((acc, response, i) => ({ ...acc, [ReadingQu[0][i]]: scale[response] }), {});
       console.log(responses);
@@ -78,6 +86,10 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     type: 'survey-likert',
     preamble: 'Reading in my spare time is something:',
     questions: ReadingQu[1].map(q => ({prompt: q, labels: scale, required: true})),
+    on_start: function() {
+      const top = document.getElementById('jspsych-progressbar-container');
+      top.scrollIntoView(true);
+    },
     on_finish: function (data) {
       const responses = Object.values(JSON.parse(data.responses)).reduce((acc, response, i) => ({ ...acc, [ReadingQu[1][i]]: scale[response] }), {});
       console.log(responses);
