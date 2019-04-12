@@ -160,11 +160,12 @@ app.post('/demographics', function (req, res, next) {
     let demographics = req.body;
     let path = 'demographics/' + demographics.subjCode + '_demographics.csv';
 
-    let headers = Object.keys(demographics.responses);
-    writer = csvWriter({ headers: headers });
+    writer = csvWriter({ headers: ['subjCode', 'question', 'response'] });
 
     writer.pipe(fs.createWriteStream(path, { flags: 'w' }));
-    writer.write(demographics.responses);
+    demographics.responses.forEach((response) => {
+      writer.write(response);
+    });
     writer.end();
 
     res.send({ success: true });
@@ -225,11 +226,13 @@ app.post('/IRQ', function (req, res) {
     fs.mkdirSync('IRQ');
   }
   let path = 'IRQ/' + IRQ.subjCode + '_IRQ.csv';
-  let headers = Object.keys(IRQ.responses);
-  writer = csvWriter({ headers: headers });
+  writer = csvWriter({ headers: ['subjCode', 'question', 'response'] });
 
   writer.pipe(fs.createWriteStream(path, { flags: 'w' }));
-  writer.write(IRQ.responses);
+  IRQ.responses.forEach((response) => {
+    console.log(response);
+    writer.write(response);
+  })
   writer.end();
 
   res.send({ success: true });
@@ -251,11 +254,12 @@ app.post('/ReadingQu', function (req, res) {
   } else if (ReadingQu.batch === 2) {
     path = 'ReadingQu/' + ReadingQu.subjCode + '_ReadingQu2.csv';
   }
-  let headers = Object.keys(ReadingQu.responses);
-  writer = csvWriter({ headers: headers });
+  writer = csvWriter({ headers: ['subjCode', 'question', 'response'] });
 
   writer.pipe(fs.createWriteStream(path, { flags: 'w' }));
-  writer.write(ReadingQu.responses);
+  ReadingQu.responses.forEach((response) => {
+    writer.write(response);
+  });
   writer.end();
 
   res.send({ success: true });

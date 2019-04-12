@@ -50,7 +50,11 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       top.scrollIntoView(true);
     },
     on_finish: function (data) {
-      const responses = Object.values(JSON.parse(data.responses)).reduce((acc, response, i) => ({ ...acc, [questions[i]]: scale[response] }), {});
+      const responses = Object.entries(JSON.parse(data.responses)).sort(
+        (a, b) => a[0] - b[0]
+      ).map(
+        ([ QN, response], i) => ({ question: questions[i], subjCode, response: scale[response] })
+      );
       console.log(responses);
       $.ajax({
           url: 'http://' + document.domain + ':' + PORT + '/IRQ',
@@ -70,7 +74,12 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       top.scrollIntoView(true);
     },
     on_finish: function (data) {
-      const responses = Object.values(JSON.parse(data.responses)).reduce((acc, response, i) => ({ ...acc, [ReadingQu[0][i]]: scale[response] }), {});
+      const responses = Object.entries(JSON.parse(data.responses)).sort((a, b) => a[0] - b[0]
+      ).map(([ QN, response], i) => ({ 
+        question: ReadingQu[0][i], 
+        response: scale[response],
+        subjCode,
+      }));
       console.log(responses);
       $.ajax({
           url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
@@ -91,7 +100,12 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       top.scrollIntoView(true);
     },
     on_finish: function (data) {
-      const responses = Object.values(JSON.parse(data.responses)).reduce((acc, response, i) => ({ ...acc, [ReadingQu[1][i]]: scale[response] }), {});
+      const responses = Object.entries(JSON.parse(data.responses)).sort((a, b) => a[0] - b[0]
+      ).map(([ QN, response], i) => ({ 
+        question: ReadingQu[1][i], 
+        response: scale[response],
+        subjCode,
+      }));
       console.log(responses);
       $.ajax({
           url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
@@ -193,7 +207,10 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     type: "surveyjs",
     questions: demographicsQuestions,
     on_finish: function(data) {
-      let demographicsResponses = data.response;
+      const demographicsResponses = Object.entries(data.response).map(([question, response]) => ({
+        subjCode, response, question,
+      }));
+      
       console.log(demographicsResponses);
       // POST demographics data to server
       $.ajax({
