@@ -4,9 +4,20 @@ function qNQuestionComparator(a, b) {
   return n1 - n2;
 }
 
+function disableScrollOnSpacebarPress () {
+  window.onkeydown = function(e) {
+    if (e.keyCode == 32 && e.target == document.body) {
+      e.preventDefault();
+    }
+  };
+}
+
 // Function Call to Run the experiment
 function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitId, ReadingQu) {
+  disableScrollOnSpacebarPress();
   let timeline = [];
+  let continue_space =
+    "<div class='right small'>(press SPACE to continue)</div>";
 
   // Data that is collected for jsPsych
   let turkInfo = jsPsych.turk.turkInfo();
@@ -47,6 +58,18 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
 
   timeline.push(consent);
 
+  let IRQinstructions = {
+    type: "instructions",
+    key_forward: "space",
+    key_backward: "backspace",
+    pages: [
+      `<p class="lead">Insert Instructions for IRQ
+            </p> ${continue_space}`
+    ]
+  };
+
+  timeline.push(IRQinstructions);
+
   const scale = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'];
   var IRQTrial = {
     type: 'survey-likert',
@@ -72,7 +95,19 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
   };
   timeline.push(IRQTrial);
 
-  var otherQuestionsTrial = {
+  let firstReadingQuestionsBatchinstructions = {
+    type: "instructions",
+    key_forward: "space",
+    key_backward: "backspace",
+    pages: [
+      `<p class="lead">Insert Instructions for first reading questions batch.
+            </p> ${continue_space}`
+    ]
+  };
+
+  timeline.push(firstReadingQuestionsBatchinstructions);
+
+  var firstReadingQuestionsBatchTrial = {
     type: 'survey-likert',
     questions: ReadingQu[0].map(q => ({prompt: q, labels: scale, required: true})),
     on_start: function() {
@@ -95,9 +130,21 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       })
     }
   };
-  timeline.push(otherQuestionsTrial);
+  timeline.push(firstReadingQuestionsBatchTrial);
 
-  var readingQuestionsTrial = {
+  let secondReadingQuestionsBatchinstructions = {
+    type: "instructions",
+    key_forward: "space",
+    key_backward: "backspace",
+    pages: [
+      `<p class="lead">Insert Instructions for second reading questions batch.
+            </p> ${continue_space}`
+    ]
+  };
+
+  timeline.push(firstReadingQuestionsBatchinstructions);
+
+  var secondReadingQuestionsBatchTrial = {
     type: 'survey-likert',
     preamble: 'Reading in my spare time is something:',
     questions: ReadingQu[1].map(q => ({prompt: q, labels: scale, required: true})),
@@ -121,7 +168,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       })
     }
   };
-  timeline.push(readingQuestionsTrial);
+  timeline.push(secondReadingQuestionsBatchTrial);
 
   let welcome_block = {
     type: "html-keyboard-response",
@@ -131,9 +178,6 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
   };
 
   timeline.push(welcome_block);
-
-  let continue_space =
-    "<div class='right small'>(press SPACE to continue)</div>";
 
   let instructions = {
     type: "instructions",
