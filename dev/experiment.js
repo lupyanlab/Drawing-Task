@@ -1,6 +1,6 @@
 function qNQuestionComparator(a, b) {
-  const n1 = Number(a.slice(1));
-  const n2 = Number(b.slice(1));
+  const n1 = Number(a[0].slice(1));
+  const n2 = Number(b[0].slice(1));
   return n1 - n2;
 }
 
