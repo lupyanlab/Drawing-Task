@@ -28,7 +28,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 				required: false
 			},
 			canvas_size_relative_to_window: {
-				type: jsPsych.plugins.parameterType.INT,
+				type: jsPsych.plugins.parameterType.FLOAT,
 				default: 0.3,
 				required: false
 			}
