@@ -173,6 +173,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       prefix: trial.prefix,
       suffix: trial.suffix,
       timer: 60,
+      canvas_size_relative_to_window: 0.3,
       on_finish: function(data) {
           
         console.log(data);
