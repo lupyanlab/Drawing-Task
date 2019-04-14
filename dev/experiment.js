@@ -1,3 +1,9 @@
+function qNQuestionComparator(a, b) {
+  const n1 = Number(a.slice(1));
+  const n2 = Number(b.slice(1));
+  return n1 - n2;
+}
+
 // Function Call to Run the experiment
 function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitId, ReadingQu) {
   let timeline = [];
@@ -51,7 +57,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     },
     on_finish: function (data) {
       const responses = Object.entries(JSON.parse(data.responses)).sort(
-        (a, b) => a[0] - b[0]
+        qNQuestionComparator
       ).map(
         ([ QN, response], i) => ({ question: questions[i], subjCode, response: scale[response] })
       );
@@ -74,7 +80,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       top.scrollIntoView(true);
     },
     on_finish: function (data) {
-      const responses = Object.entries(JSON.parse(data.responses)).sort((a, b) => a[0] - b[0]
+      const responses = Object.entries(JSON.parse(data.responses)).sort(qNQuestionComparator
       ).map(([ QN, response], i) => ({ 
         question: ReadingQu[0][i], 
         response: scale[response],
@@ -100,7 +106,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       top.scrollIntoView(true);
     },
     on_finish: function (data) {
-      const responses = Object.entries(JSON.parse(data.responses)).sort((a, b) => a[0] - b[0]
+      const responses = Object.entries(JSON.parse(data.responses)).sort(qNQuestionComparator
       ).map(([ QN, response], i) => ({ 
         question: ReadingQu[1][i], 
         response: scale[response],
