@@ -1,6 +1,23 @@
+function qNQuestionComparator(a, b) {
+  const n1 = Number(a[0].slice(1));
+  const n2 = Number(b[0].slice(1));
+  return n1 - n2;
+}
+
+function disableScrollOnSpacebarPress () {
+  window.onkeydown = function(e) {
+    if (e.keyCode == 32 && e.target == document.body) {
+      e.preventDefault();
+    }
+  };
+}
+
 // Function Call to Run the experiment
-function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitId) {
+function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitId, ReadingQu) {
+  disableScrollOnSpacebarPress();
   let timeline = [];
+  let continue_space =
+    "<div class='right small'>(press SPACE to continue)</div>";
 
   // Data that is collected for jsPsych
   let turkInfo = jsPsych.turk.turkInfo();
@@ -41,33 +58,139 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
 
   timeline.push(consent);
 
+  let IRQinstructions = {
+    type: "instructions",
+    key_forward: "space",
+    key_backward: "backspace",
+    pages: [
+      `<p class="lead">Insert Instructions for IRQ
+            </p> ${continue_space}`
+    ]
+  };
+
+  timeline.push(IRQinstructions);
+
+  const scale = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'];
+  var IRQTrial = {
+    type: 'survey-likert',
+    questions: questions.map(q => ({prompt: q, labels: scale, required: true})),
+    on_start: function() {
+      const top = document.getElementById('jspsych-progressbar-container');
+      top.scrollIntoView(true);
+    },
+    on_finish: function (data) {
+      const responses = Object.entries(JSON.parse(data.responses)).sort(
+        qNQuestionComparator
+      ).map(
+        ([ QN, response], i) => ({ question: questions[i], subjCode, response: scale[response] })
+      );
+      console.log(responses);
+      $.ajax({
+          url: 'http://' + document.domain + ':' + PORT + '/IRQ',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ subjCode, responses }),
+      })
+    }
+  };
+  timeline.push(IRQTrial);
+
+  let firstReadingQuestionsBatchinstructions = {
+    type: "instructions",
+    key_forward: "space",
+    key_backward: "backspace",
+    pages: [
+      `<p class="lead">Insert Instructions for first reading questions batch.
+            </p> ${continue_space}`
+    ]
+  };
+
+  timeline.push(firstReadingQuestionsBatchinstructions);
+
+  var firstReadingQuestionsBatchTrial = {
+    type: 'survey-likert',
+    questions: ReadingQu[0].map(q => ({prompt: q, labels: scale, required: true})),
+    on_start: function() {
+      const top = document.getElementById('jspsych-progressbar-container');
+      top.scrollIntoView(true);
+    },
+    on_finish: function (data) {
+      const responses = Object.entries(JSON.parse(data.responses)).sort(qNQuestionComparator
+      ).map(([ QN, response], i) => ({ 
+        question: ReadingQu[0][i], 
+        response: scale[response],
+        subjCode,
+      }));
+      console.log(responses);
+      $.ajax({
+          url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ subjCode, responses, batch: 1 }),
+      })
+    }
+  };
+  timeline.push(firstReadingQuestionsBatchTrial);
+
+  let secondReadingQuestionsBatchinstructions = {
+    type: "instructions",
+    key_forward: "space",
+    key_backward: "backspace",
+    pages: [
+      `<p class="lead">Insert Instructions for second reading questions batch.
+            </p> ${continue_space}`
+    ]
+  };
+
+  timeline.push(firstReadingQuestionsBatchinstructions);
+
+  var secondReadingQuestionsBatchTrial = {
+    type: 'survey-likert',
+    preamble: 'Reading in my spare time is something:',
+    questions: ReadingQu[1].map(q => ({prompt: q, labels: scale, required: true})),
+    on_start: function() {
+      const top = document.getElementById('jspsych-progressbar-container');
+      top.scrollIntoView(true);
+    },
+    on_finish: function (data) {
+      const responses = Object.entries(JSON.parse(data.responses)).sort(qNQuestionComparator
+      ).map(([ QN, response], i) => ({ 
+        question: ReadingQu[1][i], 
+        response: scale[response],
+        subjCode,
+      }));
+      console.log(responses);
+      $.ajax({
+          url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ subjCode, responses, batch: 2 }),
+      })
+    }
+  };
+  timeline.push(secondReadingQuestionsBatchTrial);
+
   let welcome_block = {
     type: "html-keyboard-response",
     choices: [32],
-    stimulus: `<h1>Thank you for accepting the HIT!</h1>
-        <p class="lead">The next screen will show you the instructions. Press SPACE to begin.</p>`
+    stimulus: `<h1>Drawing</h1>
+        <p class="lead">Welcome to the experiment. Thank you for participating! Press SPACE to begin.</p>`
   };
 
   timeline.push(welcome_block);
-
-  let continue_space =
-    "<div class='right small'>(press SPACE to continue)</div>";
 
   let instructions = {
     type: "instructions",
     key_forward: "space",
     key_backward: "backspace",
     pages: [
-      `<p class="lead">In this HIT you will be asked to draw some creatures. 
-      Some of them correspond to real animals (like a rabbit). Most, however, are imaginary. 
-      For example, you might be asked to draw a "sask". Sound out the word and use your imagination 
-      about what a creature with this name would look like. You will have 60 seconds from the time you begin drawing
-      to complete each drawing. 
+      `<p class="lead">Insert Instructions
             </p> ${continue_space}`
     ]
   };
 
   timeline.push(instructions);
+
 
   let trial_number = 1;
   let num_trials = trials.length;
@@ -94,6 +217,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       prefix: trial.prefix,
       suffix: trial.suffix,
       timer: 60,
+      canvas_size_relative_to_window: 0.3,
       on_finish: function(data) {
           
         console.log(data);
@@ -130,124 +254,21 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     timeline.push(freeDrawing);
     }
 
-  let questionsInstructions = {
-    type: "instructions",
-    key_forward: "space",
-    key_backward: "backspace",
-    pages: [
-      `<p class="lead">Thanks! We'll now ask you some demographic questions and we'll be all done!
-            </p> ${continue_space}`
-    ]
-  };
-  timeline.push(questionsInstructions);
-
-  let demographicsQuestions = [
-
-    {
-      type: "radiogroup",
-      name: "drawing_implement",
-      isRequired: true,
-      title: "What did you use to draw?",
-      choices: ["Mouse", "Laptop trackpad", "Stylus", "Finger"]
-    },
-
-
-    {
-      type: "radiogroup",
-      name: "artclass",
-      isRequired: true,
-      title: "Have you taken any drawing classes?",
-      choices: ["Yes", "No"]
-    },
-
-    {
-      type: "radiogroup",
-      name: "artskill",
-      isRequired: true,
-      title: "Would you consider yourself skilled at drawing?",
-      choices: ["1-Not at all", "2-Slightly", "3-Moderately skilled", "4-Highly skilled"]
-    },
-
-
-    {
-      type: "radiogroup",
-      name: "gender",
-      isRequired: true,
-      title: "What is your gender?",
-      choices: ["Male", "Female", "Other", "Prefer not to say"]
-    },
-
-    {
-      type: "radiogroup",
-      name: "native",
-      isRequired: true,
-      title: "Are you a native English speaker",
-      choices: ["Yes", "No"]
-    },
-    {
-      type: "text",
-      name: "native language",
-      visibleIf: "{native}='No'",
-      title: "Please indicate your native language or languages:"
-    },
-
-    {
-      type: "text",
-      name: "languages",
-      title: "What other languages do you speak?"
-    },
-
-    { type: "text", name: "age", title: "What is your age?", width: "auto" },
-
-    {
-      type: "radiogroup",
-      name: "degree",
-      isRequired: true,
-      title: "What is the highest degree or level of school you have completed/ If currently enrolled, please indicate highest degree received.",
-      choices: [
-        "lt_highschool|Less than high school",
-        "highSchool|High school diploma",
-        "somecollege|Some college, no degree",
-        "associates|Associate's degree",
-        "bachelors|Bachelor's degree",
-        "masters|Master's degree",
-        "terminal|PhD, law, or medical degree",
-        "noResp|Prefer not to say"
-      ]
-    },
-    {
-      type: "text",
-      name: "favorite hs subject",
-      visibleIf: "{degree}='Less than high school' or {degree}='High school diploma' or {degree}='Some college, no degree'",
-      title: "What was your favorite subject in high school?"
-    },
-    {
-      type: "text",
-      name: "college",
-      visibleIf: "{degree}='associates' or {degree}='bachelors' or {degree}='masters' or {degree}='terminal'",
-      title: "What did you study in college?"
-    },
-    {
-      type: "text",
-      name: "grad",
-      visibleIf: "{degree}='masters' or {degree}='terminal'",
-      title: "What did you study in graduate school?"
-    }
-  ];
-
   let demographicsTrial = {
     type: "surveyjs",
     questions: demographicsQuestions,
     on_finish: function(data) {
-      let demographicsResponses = data.response;
+      const demographicsResponses = Object.entries(data.response).map(([question, response]) => ({
+        subjCode, response, question,
+      }));
+      
       console.log(demographicsResponses);
-      let demographics = Object.assign({ subjCode }, demographicsResponses);
       // POST demographics data to server
       $.ajax({
         url: "http://" + document.domain + ":" + PORT + "/demographics",
         type: "POST",
         contentType: "application/json",
-        data: JSON.stringify(demographics),
+        data: JSON.stringify({ subjCode, responses: demographicsResponses }),
         success: function() {}
       });
 
@@ -257,8 +278,10 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
                 
                 <h3>Debriefing </h3>
                 <p class="lead">
-                This nonsense words that you were asked to draw contain combinations of sounds that are predicted to elicit drawings that contain certain properties such as smoothness and sharpness. By subjecting the drawings to machine-vision analysis and by having them rated by other people, we gain a better idea of how the sounds we hear as part of our language influence perceptual processing. Thanks again for participating!
-		</p>
+                Thank you for your participation. The study is designed to collect information about the different ways 
+                in which people typically represent thoughts in their mind. The responses will be used in the 
+                development of a shorter questionnaire to assess differences in these representations. 
+                </p>
                 `;
       jsPsych.endExperiment(endmessage);
     }

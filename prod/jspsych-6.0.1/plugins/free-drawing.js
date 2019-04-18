@@ -26,6 +26,11 @@ jsPsych.plugins["free-drawing"] = (function () {
 				type: jsPsych.plugins.parameterType.STRING, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
 				default: '',
 				required: false
+			},
+			canvas_size_relative_to_window: {
+				type: jsPsych.plugins.parameterType.INT,
+				default: 0.3,
+				required: false
 			}
 		}
 	}
@@ -36,7 +41,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 		var trial_data = {
 			parameter_name: 'parameter value'
 		};
-		let percentage = 0.3;
+		let percentage = trial.canvas_size_relative_to_window;
 		let defaultWidth = 2;
 
 		display_element.innerHTML = `
