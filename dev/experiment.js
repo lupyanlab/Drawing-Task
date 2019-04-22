@@ -75,7 +75,7 @@ The following HIT will ask you a series of simple questions about language and m
 
   timeline.push(IRQinstructions);
 
-  const scale = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'];
+  const scale = ['Strongly disagree', 'Somewhat disagree', 'Neither agree nor disagree', 'Somewhat agree', 'Strongly agree'];
   var IRQTrial = {
     type: 'survey-likert',
     questions: questions.map(q => ({prompt: q, labels: scale, required: true})),
@@ -189,7 +189,7 @@ The following HIT will ask you a series of simple questions about language and m
     key_forward: "space",
     key_backward: "backspace",
     pages: [
-      `<p class="lead">You will be asked to draw a total of 4 different pictures. When you are ready to start press the space bar.
+      `<p class="lead">You will be asked to draw a total of 4 different pictures.When you are ready to start press the space bar.
             </p> ${continue_space}`
     ]
   };
