@@ -42,7 +42,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 			parameter_name: 'parameter value'
 		};
 		let percentage = trial.canvas_size_relative_to_window;
-		let defaultWidth = 2;
+		let defaultWidth = 1;
 
 		display_element.innerHTML = `
 		<div id="timer-container"><h4>You have 60 seconds to draw.</h4></div>

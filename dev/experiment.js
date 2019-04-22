@@ -149,37 +149,37 @@ The following HIT will ask you a series of simple questions about language and m
 
   timeline.push(firstReadingQuestionsBatchinstructions);
 
-  var secondReadingQuestionsBatchTrial = {
-    type: 'survey-likert',
-    preamble: 'Reading in my spare time is something:',
-    questions: ReadingQu[1].map(q => ({prompt: q, labels: scale, required: true})),
-    on_start: function() {
-      const top = document.getElementById('jspsych-progressbar-container');
-      top.scrollIntoView(true);
-    },
-    on_finish: function (data) {
-      const responses = Object.entries(JSON.parse(data.responses)).sort(qNQuestionComparator
-      ).map(([ QN, response], i) => ({ 
-        question: ReadingQu[1][i], 
-        response: scale[response],
-        subjCode,
-      }));
-      console.log(responses);
-      $.ajax({
-          url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
-          type: 'POST',
-          contentType: 'application/json',
-          data: JSON.stringify({ subjCode, responses, batch: 2 }),
-      })
-    }
-  };
-  timeline.push(secondReadingQuestionsBatchTrial);
+//  var secondReadingQuestionsBatchTrial = {
+//    type: 'survey-likert',
+ //   preamble: 'Reading in my spare time is something:',
+  //  questions: ReadingQu[1].map(q => ({prompt: q, labels: scale, required: true})),
+   // on_start: function() {
+     // const top = document.getElementById('jspsych-progressbar-container');
+      //top.scrollIntoView(true);
+    //},
+    //on_finish: function (data) {
+     // const responses = Object.entries(JSON.parse(data.responses)).sort(qNQuestionComparator
+      //).map(([ QN, response], i) => ({ 
+       // question: ReadingQu[1][i], 
+        //response: scale[response],
+        //subjCode,
+     // }));
+     // console.log(responses);
+      //$.ajax({
+       //   url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
+        //  type: 'POST',
+         // contentType: 'application/json',
+         // data: JSON.stringify({ subjCode, responses, batch: 2 }),
+     // })
+   // }
+ // };
+//  timeline.push(secondReadingQuestionsBatchTrial); 
 
   let welcome_block = {
     type: "html-keyboard-response",
     choices: [32],
     stimulus: `<h1>Drawing</h1>
-        <p class="lead">For the next part of the task we would like you to draw some pictures. You will be given the name of something to draw, and then you will have a maximum of 60 seconds to complete your drawing from when you make your first mark. You will be asked to draw a total of 4 different pictures.</p>`
+        <p class="lead">For the next part of the task we would like you to draw some pictures. You will be given the name of something to draw, and then you will have a maximum of 60 seconds to complete your drawing from when you make your first mark. </p>`
   };
 
   timeline.push(welcome_block);
@@ -189,7 +189,7 @@ The following HIT will ask you a series of simple questions about language and m
     key_forward: "space",
     key_backward: "backspace",
     pages: [
-      `<p class="lead">When you are ready to start drawing press the space bar.
+      `<p class="lead">You will be asked to draw a total of 4 different pictures. When you are ready to start press the space bar.
             </p> ${continue_space}`
     ]
   };
