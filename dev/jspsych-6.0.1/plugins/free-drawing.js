@@ -77,7 +77,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 					<br />
 					<br />
 				  
-					<button id="submit-drawing" class="btn btn-primary">Submit Drawing</button><br>
+					<button id="submit-drawing" class="btn btn-primary" disabled>Submit Drawing</button><br>
 				</div>
 			</div>
 			</div>`;
@@ -123,6 +123,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 			canvas.on({
 				'mouse:down': () => {
 					if (!countdownStarted) {
+						$('submit-drawing').disabled = false;
 						timer -= 0.01;
 						$('timer-container').innerHTML = `<h4>You have <span id="timer">${Math.floor(timer)}</span> seconds left...</h4>`;
 						countdown = setInterval(() => {
