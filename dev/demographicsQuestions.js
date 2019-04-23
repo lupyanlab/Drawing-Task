@@ -2,10 +2,17 @@
   let demographicsQuestions = [
     {
       type: "radiogroup",
+      name: "drawing_implement",
+      isRequired: true,
+      title: "What did you use to draw?",
+      choices: ["Laptop trackpad", "Mouse", "Standalone trackpad", "Touch screen", "Other"]
+    },
+    {
+      type: "radiogroup",
       name: "gender",
       isRequired: true,
       title: "What is your gender?",
-      choices: ["Male", "Female", "Other", "Perfer not to say"]
+      choices: ["Male", "Female", "Other", "Prefer not to say"]
     },
 
     {
@@ -43,15 +50,15 @@
       type: "radiogroup",
       name: "degree",
       isRequired: true,
-      title: "What is the highest degree or level of shcool you have completed/ If currently enrolled, highest degree received.",
+      title: "What is the highest degree or level of school you have completed. If currently enrolled, highest degree received.",
       choices: [
-        "Less than high school",
-        "High school diploma",
-        "Some college, no degree",
-        "associates|Associate's degree",
-        "bachelors|Bachelor's degree",
-        "masters|Master's degree",
-        "PhD, law, or medical degree",
+        "1_lt_high_school|Less than high school",
+        "2_high_school|High school diploma",
+        "3_some_college|Some college, no degree",
+        "4_associates|Associate's degree",
+        "5_bachelors|Bachelor's degree",
+        "6_masters|Master's degree",
+        "7_phd|PhD, law, or medical degree",
         "Prefer not to say"
       ]
     },

@@ -64,11 +64,9 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     key_backward: "backspace",
     pages: [
       `<p class="lead">
-The following HIT will ask you a series of simple questions about language and mental imagery. 
-
- First answer approx 40 quick multiple-choice questions about how you think.
-
- Please think carefully about each question. If you answer carelessly, your payment may be denied.
+The first part of the HIT will show you about 40 statements describing different ways of thinking.<br>
+Please indicate your agreement/disagreement with each.<br>
+Please think carefully about each item. If you answer carelessly, your payment may be denied.
             </p> ${continue_space}`
     ]
   };
@@ -105,7 +103,7 @@ The following HIT will ask you a series of simple questions about language and m
     key_forward: "space",
     key_backward: "backspace",
     pages: [
-      `<p class="lead">Following are statements about reading. For each statement, please decide what is most true for you select the extent to which you agree or disagree with each statement.
+      `<p class="lead">This next part involves some statements about reading habits. Please indicate your level of agreement/disagreement with each.
             </p> ${continue_space}`
     ]
   };
@@ -137,17 +135,16 @@ The following HIT will ask you a series of simple questions about language and m
   };
   timeline.push(firstReadingQuestionsBatchTrial);
 
-  let secondReadingQuestionsBatchinstructions = {
-    type: "instructions",
-    key_forward: "space",
-    key_backward: "backspace",
-    pages: [
-      `<p class="lead">
-            </p> ${continue_space}`
-    ]
-  };
+  // let secondReadingQuestionsBatchinstructions = {
+  //   type: "instructions",
+  //   key_forward: "space",
+  //   key_backward: "backspace",
+  //   pages: [
+  //     `<p class="lead">
+  //           </p> ${continue_space}`
+  //   ]
+  // };
 
-  timeline.push(firstReadingQuestionsBatchinstructions);
 
 //  var secondReadingQuestionsBatchTrial = {
 //    type: 'survey-likert',
@@ -175,26 +172,26 @@ The following HIT will ask you a series of simple questions about language and m
  // };
 //  timeline.push(secondReadingQuestionsBatchTrial); 
 
-  let welcome_block = {
-    type: "html-keyboard-response",
-    choices: [32],
-    stimulus: `<h1>Drawing</h1>
-        <p class="lead">For the next part of the task we would like you to draw some pictures. You will be given the name of something to draw, and then you will have a maximum of 60 seconds to complete your drawing from when you make your first mark. </p>`
-  };
+  // let welcome_block = {
+  //   type: "html-keyboard-response",
+  //   choices: [32],
+  //   stimulus: `<h1>Drawing</h1>
+  //       <p class="lead">For the next part of the task we would like you to draw some pictures. You will be given the name of something to draw, and then you will have a maximum of 60 seconds to complete your drawing from when you make your first mark. </p>`
+  // };
 
-  timeline.push(welcome_block);
+  // timeline.push(welcome_block);
 
-  let instructions = {
+  let drawing_instructions = {
     type: "instructions",
     key_forward: "space",
     key_backward: "backspace",
     pages: [
-      `<p class="lead">You will be asked to draw a total of 4 different pictures.When you are ready to start press the space bar.
+      `<p class="lead">Now for the fun part! You will be asked to draw 4 different pictures. When you are ready to start press the space bar.
             </p> ${continue_space}`
     ]
   };
 
-  timeline.push(instructions);
+  timeline.push(drawing_instructions);
 
 
   let trial_number = 1;
@@ -221,7 +218,7 @@ The following HIT will ask you a series of simple questions about language and m
       prompt: trial.word_to_draw,
       prefix: trial.prefix,
       suffix: trial.suffix,
-      timer: 60,
+      timer: 120,
       canvas_size_relative_to_window: 0.3,
       pen_width: 1,
       on_finish: function(data) {
@@ -280,13 +277,12 @@ The following HIT will ask you a series of simple questions about language and m
 
       let endmessage = `
                 <p class="lead">Thank you for participating! Your completion code is ${participantID}. Copy and paste this in 
-                MTurk to get paid. If you have any questions or comments, please email lupyan@wisc.edu.</p>
+                MTurk to get paid. If you have any questions or comments, please email hroebuck@wisc.edu.</p>
                 
                 <h3>Debriefing </h3>
                 <p class="lead">
-                Thank you for your participation. The study is designed to collect information about the different ways 
-                in which people typically represent thoughts in their mind. The responses will be used in the 
-                development of a shorter questionnaire to assess differences in these representations. 
+                The purpose of this study is to see how people who experience their thoughts in different ways (e.g., more or less language-like)
+                include different elements in their drawings of common animals and objects. 
                 </p>
                 `;
       jsPsych.endExperiment(endmessage);
