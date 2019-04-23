@@ -29,6 +29,15 @@
     },
 
     { type: "text", name: "age", title: "What is your age?", width: "auto" },
+    
+    {
+      type: "radiogroup",
+      name: "artskill",
+      isRequired: true,
+      title: "How would you rate your artistic skill level?",
+      choices: ["Below average", "Slightly below average", "Average", "Slightly above average", "Above average"]
+    },
+    
 
     {
       type: "radiogroup",

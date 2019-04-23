@@ -63,14 +63,19 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     key_forward: "space",
     key_backward: "backspace",
     pages: [
-      `<p class="lead">Insert Instructions for IRQ
+      `<p class="lead">
+The following HIT will ask you a series of simple questions about language and mental imagery. 
+
+ First answer approx 40 quick multiple-choice questions about how you think.
+
+ Please think carefully about each question. If you answer carelessly, your payment may be denied.
             </p> ${continue_space}`
     ]
   };
 
   timeline.push(IRQinstructions);
 
-  const scale = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'];
+  const scale = ['Strongly disagree', 'Somewhat disagree', 'Neither agree nor disagree', 'Somewhat agree', 'Strongly agree'];
   var IRQTrial = {
     type: 'survey-likert',
     questions: questions.map(q => ({prompt: q, labels: scale, required: true})),
@@ -100,7 +105,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     key_forward: "space",
     key_backward: "backspace",
     pages: [
-      `<p class="lead">Insert Instructions for first reading questions batch.
+      `<p class="lead">Following are statements about reading. For each statement, please decide what is most true for you select the extent to which you agree or disagree with each statement.
             </p> ${continue_space}`
     ]
   };
@@ -137,44 +142,44 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     key_forward: "space",
     key_backward: "backspace",
     pages: [
-      `<p class="lead">Insert Instructions for second reading questions batch.
+      `<p class="lead">
             </p> ${continue_space}`
     ]
   };
 
   timeline.push(firstReadingQuestionsBatchinstructions);
 
-  var secondReadingQuestionsBatchTrial = {
-    type: 'survey-likert',
-    preamble: 'Reading in my spare time is something:',
-    questions: ReadingQu[1].map(q => ({prompt: q, labels: scale, required: true})),
-    on_start: function() {
-      const top = document.getElementById('jspsych-progressbar-container');
-      top.scrollIntoView(true);
-    },
-    on_finish: function (data) {
-      const responses = Object.entries(JSON.parse(data.responses)).sort(qNQuestionComparator
-      ).map(([ QN, response], i) => ({ 
-        question: ReadingQu[1][i], 
-        response: scale[response],
-        subjCode,
-      }));
-      console.log(responses);
-      $.ajax({
-          url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
-          type: 'POST',
-          contentType: 'application/json',
-          data: JSON.stringify({ subjCode, responses, batch: 2 }),
-      })
-    }
-  };
-  timeline.push(secondReadingQuestionsBatchTrial);
+//  var secondReadingQuestionsBatchTrial = {
+//    type: 'survey-likert',
+ //   preamble: 'Reading in my spare time is something:',
+  //  questions: ReadingQu[1].map(q => ({prompt: q, labels: scale, required: true})),
+   // on_start: function() {
+     // const top = document.getElementById('jspsych-progressbar-container');
+      //top.scrollIntoView(true);
+    //},
+    //on_finish: function (data) {
+     // const responses = Object.entries(JSON.parse(data.responses)).sort(qNQuestionComparator
+      //).map(([ QN, response], i) => ({ 
+       // question: ReadingQu[1][i], 
+        //response: scale[response],
+        //subjCode,
+     // }));
+     // console.log(responses);
+      //$.ajax({
+       //   url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
+        //  type: 'POST',
+         // contentType: 'application/json',
+         // data: JSON.stringify({ subjCode, responses, batch: 2 }),
+     // })
+   // }
+ // };
+//  timeline.push(secondReadingQuestionsBatchTrial); 
 
   let welcome_block = {
     type: "html-keyboard-response",
     choices: [32],
     stimulus: `<h1>Drawing</h1>
-        <p class="lead">Welcome to the experiment. Thank you for participating! Press SPACE to begin.</p>`
+        <p class="lead">For the next part of the task we would like you to draw some pictures. You will be given the name of something to draw, and then you will have a maximum of 60 seconds to complete your drawing from when you make your first mark. </p>`
   };
 
   timeline.push(welcome_block);
@@ -184,7 +189,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     key_forward: "space",
     key_backward: "backspace",
     pages: [
-      `<p class="lead">Insert Instructions
+      `<p class="lead">You will be asked to draw a total of 4 different pictures.When you are ready to start press the space bar.
             </p> ${continue_space}`
     ]
   };
