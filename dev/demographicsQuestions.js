@@ -12,7 +12,7 @@
       name: "gender",
       isRequired: true,
       title: "What is your gender?",
-      choices: ["Male", "Female", "Other", "Prefer not to say"]
+      choices: ["Male", "Female", "Other", "NA|Prefer not to say"]
     },
 
     {
@@ -41,8 +41,8 @@
       type: "radiogroup",
       name: "artskill",
       isRequired: true,
-      title: "How would you rate how well can you draw?",
-      choices: ["Below average", "Slightly below average", "Average", "Slightly above average", "Above average"]
+      title: "How well can you draw?",
+      choices: ["1|Below average", "2|Slightly below average", "3|Average", "4|Slightly above average", "5|Above average"]
     },
     
 
@@ -59,7 +59,7 @@
         "5_bachelors|Bachelor's degree",
         "6_masters|Master's degree",
         "7_phd|PhD, law, or medical degree",
-        "Prefer not to say"
+        "NA|Prefer not to say"
       ]
     },
     {
