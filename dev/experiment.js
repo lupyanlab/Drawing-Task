@@ -223,6 +223,7 @@ The following HIT will ask you a series of simple questions about language and m
       suffix: trial.suffix,
       timer: 60,
       canvas_size_relative_to_window: 0.3,
+      pen_width: 1,
       on_finish: function(data) {
           
         console.log(data);

@@ -17,6 +17,10 @@ jsPsych.plugins["free-drawing"] = (function () {
 				type: jsPsych.plugins.parameterType.INT, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
 				default: 60
 			},
+			pen_width: {
+				type: jsPsych.plugins.parameterType.INT, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
+				default: 1
+			},
 			prefix: {
 				type: jsPsych.plugins.parameterType.STRING, // INT, IMAGE, KEYCODE, STRING, FUNCTION, FLOAT
 				default: '',
@@ -42,7 +46,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 			parameter_name: 'parameter value'
 		};
 		let percentage = trial.canvas_size_relative_to_window;
-		let defaultWidth = 1;
+		let defaultWidth = trial.pen_width;
 
 		display_element.innerHTML = `
 		<div id="timer-container"><h4>You have ${trial.timer} seconds to draw.</h4></div>
