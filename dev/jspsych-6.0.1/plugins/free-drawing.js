@@ -45,7 +45,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 		let defaultWidth = 2;
 
 		display_element.innerHTML = `
-		<div id="timer-container"><h4>You have 60 seconds to draw.</h4></div>
+		<div id="timer-container"><h4>You have ${trial.timer} seconds to draw.</h4></div>
 		<h4>${trial.prefix}</h4>
 		<h1 style="margin-top:0px">${trial.prompt}</h1>
 		<h4>${trial.suffix}</h4>
@@ -116,7 +116,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 				jsPsych.finishTrial({
 					drawing: document.getElementById('c').toDataURL(),
 					prompt: trial.prompt,
-					drawing_time: 60-timer
+					drawing_time: trial.timer - timer
 				});
 			};
 
@@ -132,7 +132,7 @@ jsPsych.plugins["free-drawing"] = (function () {
 								jsPsych.finishTrial({
 									drawing: document.getElementById('c').toDataURL(),
 									prompt: trial.prompt,
-									drawing_time: 60
+									drawing_time: trial.timer,
 								});
 							}
 							else {
