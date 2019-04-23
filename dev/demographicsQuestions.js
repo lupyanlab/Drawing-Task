@@ -41,7 +41,7 @@
       type: "radiogroup",
       name: "artskill",
       isRequired: true,
-      title: "How would you rate your artistic skill level?",
+      title: "How well can you draw?",
       choices: ["Below average", "Slightly below average", "Average", "Slightly above average", "Above average"]
     },
     
