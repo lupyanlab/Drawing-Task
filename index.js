@@ -46,6 +46,9 @@ app.post('/trials', function (req, res, next) {
 
   let trials = [];
   fs.readdir('./trials', (err, filenames) => {
+    filenames = filenames.filter(filename =>
+      filename.startsWith("trials_drawing_")
+    );
     let filename = filenames[Math.floor(Math.random()*filenames.length)];
     csv({delimiter: ','})
     .fromFile('./trials/'+filename)
