@@ -13,8 +13,7 @@ function disableScrollOnSpacebarPress () {
 }
 
 // Function Call to Run the experiment
-// function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitId, ReadingQu) {
-function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitId) {
+function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitId, ReadingQu) {
   disableScrollOnSpacebarPress();
   let timeline = [];
   let continue_space =
@@ -59,82 +58,82 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
 
   timeline.push(consent);
 
-   // let IRQinstructions = {
-     // type: "instructions",
-      //key_forward: "space",
-     // key_backward: "backspace",
-    //  pages: [
-   //     `<p class="lead">
-  //The first part of the HIT will show you about 40 statements describing different ways of thinking.<br>
-  //Please indicate your agreement/disagreement with each.<br>
-  //Please think carefully about each item. If you answer carelessly, your payment may be denied.
-      //        </p> ${continue_space}`
-     // ]
-    //};
+  let IRQinstructions = {
+    type: "instructions",
+    key_forward: "space",
+    key_backward: "backspace",
+    pages: [
+      `<p class="lead">
+The first part of the HIT will show you about 40 statements describing different ways of thinking.<br>
+Please indicate your agreement/disagreement with each.<br>
+Please think carefully about each item. If you answer carelessly, your payment may be denied.
+            </p> ${continue_space}`
+    ]
+  };
 
-    //timeline.push(IRQinstructions);
+  timeline.push(IRQinstructions);
 
-    //const scale = ['Strongly disagree', 'Somewhat disagree', 'Neither agree nor disagree', 'Somewhat agree', 'Strongly agree'];
-    //var IRQTrial = {
-      //type: 'survey-likert',
-      //questions: questions.map(q => ({prompt: q, labels: scale, required: true})),
-      //on_start: function() {
-        //const top = document.getElementById('jspsych-progressbar-container');
-       // top.scrollIntoView(true);
-      //},
-      //on_finish: function (data) {
-        //const responses = Object.entries(JSON.parse(data.responses)).sort(
-          //qNQuestionComparator
-       // ).map(
-          //([ QN, response], i) => ({ question: questions[i], subjCode, response: scale[response] })
-        //);
-        //console.log(responses);
-        //$.ajax({
-            //url: 'http://' + document.domain + ':' + PORT + '/IRQ',
-            //type: 'POST',
-            //contentType: 'application/json',
-            //data: JSON.stringify({ subjCode, responses }),
-       // })
-     // }
-    //};
-   // timeline.push(IRQTrial);
+  const scale = ['Strongly disagree', 'Somewhat disagree', 'Neither agree nor disagree', 'Somewhat agree', 'Strongly agree'];
+  var IRQTrial = {
+    type: 'survey-likert',
+    questions: questions.map(q => ({prompt: q, labels: scale, required: true})),
+    on_start: function() {
+      const top = document.getElementById('jspsych-progressbar-container');
+      top.scrollIntoView(true);
+    },
+    on_finish: function (data) {
+      const responses = Object.entries(JSON.parse(data.responses)).sort(
+        qNQuestionComparator
+      ).map(
+        ([ QN, response], i) => ({ question: questions[i], subjCode, response: scale[response] })
+      );
+      console.log(responses);
+      $.ajax({
+          url: 'http://' + document.domain + ':' + PORT + '/IRQ',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ subjCode, responses }),
+      })
+    }
+  };
+  timeline.push(IRQTrial);
 
-   // let firstReadingQuestionsBatchinstructions = {
-     // type: "instructions",
-      //key_forward: "space",
-      //key_backward: "backspace",
-      //pages: [
-        //`<p class="lead">This next part involves some statements about reading habits. Please indicate your level of agreement/disagreement with each.
-           //   </p> ${continue_space}`
-      //]
-   // };
+  let firstReadingQuestionsBatchinstructions = {
+    type: "instructions",
+    key_forward: "space",
+    key_backward: "backspace",
+    pages: [
+      `<p class="lead">This next part involves some statements about reading habits. Please indicate your level of agreement/disagreement with each.
+            </p> ${continue_space}`
+    ]
+  };
 
-    //timeline.push(firstReadingQuestionsBatchinstructions);
+  timeline.push(firstReadingQuestionsBatchinstructions);
 
-   // var firstReadingQuestionsBatchTrial = {
-      //type: 'survey-likert',
-      //questions: ReadingQu[0].map(q => ({prompt: q, labels: scale, required: true})),
-      //on_start: function() {
-        //const top = document.getElementById('jspsych-progressbar-container');
-        //top.scrollIntoView(true);
-     // },
-      //on_finish: function (data) {
-        //const responses = Object.entries(JSON.parse(data.responses)).sort(qNQuestionComparator
-        //).map(([ QN, response], i) => ({ 
-          //question: ReadingQu[0][i], 
-          //response: scale[response],
-          //subjCode,
-        //}));
-        //console.log(responses);
-        //$.ajax({
-           // url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
-            //type: 'POST',
-            //contentType: 'application/json',
-            //data: JSON.stringify({ subjCode, responses, batch: 1 }),
-       // })
-     // }
-    //};
-    //timeline.push(firstReadingQuestionsBatchTrial);
+  var firstReadingQuestionsBatchTrial = {
+    type: 'survey-likert',
+    questions: ReadingQu[0].map(q => ({prompt: q, labels: scale, required: true})),
+    on_start: function() {
+      const top = document.getElementById('jspsych-progressbar-container');
+      top.scrollIntoView(true);
+    },
+    on_finish: function (data) {
+      const responses = Object.entries(JSON.parse(data.responses)).sort(qNQuestionComparator
+      ).map(([ QN, response], i) => ({ 
+        question: ReadingQu[0][i], 
+        response: scale[response],
+        subjCode,
+      }));
+      console.log(responses);
+      $.ajax({
+          url: 'http://' + document.domain + ':' + PORT + '/ReadingQu',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ subjCode, responses, batch: 1 }),
+      })
+    }
+  };
+  timeline.push(firstReadingQuestionsBatchTrial);
 
   // let secondReadingQuestionsBatchinstructions = {
   //   type: "instructions",
@@ -187,7 +186,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
     key_forward: "space",
     key_backward: "backspace",
     pages: [
-      `<p class="lead">Now for the fun part! You will be asked to draw 10 different pictures. When you are ready to start press the space bar.
+      `<p class="lead">Now for the fun part! You will be asked to draw 4 different pictures. When you are ready to start press the space bar.
             </p> ${continue_space}`
     ]
   };
@@ -277,8 +276,7 @@ function runExperiment(trials, subjCode, questions, workerId, assignmentId, hitI
       });
 
       let endmessage = `
-                <p class="lead">Thank you for participating! Your completion code is ${participantID}. Copy and paste this in 
-                MTurk to get paid. If you have any questions or comments, please email hroebuck@wisc.edu.</p>
+                <p class="lead">Thank you for participating! If you have any questions or comments, please email hroebuck@wisc.edu.</p>
                 
                 <h3>Debriefing </h3>
                 <p class="lead">
