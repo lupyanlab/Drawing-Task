@@ -276,7 +276,8 @@ Please think carefully about each item. If you answer carelessly, your payment m
       });
 
       let endmessage = `
-                <p class="lead">Thank you for participating! If you have any questions or comments, please email hroebuck@wisc.edu.</p>
+                <p class="lead">Thank you for participating! Your completion code is ${participantID}. Copy and paste this in 
+                MTurk to get paid. If you have any questions or comments, please email hroebuck@wisc.edu.</p>
                 
                 <h3>Debriefing </h3>
                 <p class="lead">
